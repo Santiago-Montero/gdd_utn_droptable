@@ -99,6 +99,13 @@ CREATE TABLE [DROP_TABLE].[Localidad](
 	CONSTRAINT fk_localidad_barrio FOREIGN KEY ([id_barrio]) REFERENCES [DROP_TABLE].[Barrio]([id_barrio])
 );
 
+CREATE TABLE [DROP_TABLE].[Provincia](
+	[id_provincia] [int] IDENTITY(1,1) PRIMARY KEY,
+	[nombre] VARCHAR(100) NOT NULL,
+	[id_localidad] [int],
+	CONSTRAINT fk_provincia_localidad FOREIGN KEY ([id_localidad]) REFERENCES [DROP_TABLE].[Localidad]([id_localidad])
+);
+
 CREATE TABLE [DROP_TABLE].[Sucursal](
 	[id_sucursal] [int] IDENTITY(1,1) PRIMARY KEY,
 	[nombre] VARCHAR(100) NOT NULL,
@@ -118,10 +125,27 @@ CREATE TABLE [DROP_TABLE].[Alquiler](
 	[comision] [int] ,
 	[gastos] [int] ,
 	[codigo] [int] ,
-	[id_estado_alquiler] [int] ,
 	[id_anuncio] [int] ,
-	CONSTRAINT fk_alquiler_anuncio FOREIGN KEY ([id_anuncio]) REFERENCES [DROP_TABLE].Anuncio([id_anuncio])
+	CONSTRAINT fk_alquiler_anuncio FOREIGN KEY ([id_anuncio]) REFERENCES [DROP_TABLE].Anuncio([id_anuncio]),
+	[id_estado_alquiler] [int] ,
+	CONSTRAINT fk_estado_alquiler FOREIGN KEY ([id_estado_alquiler]) REFERENCES [DROP_TABLE].[Alquiler_Estado]([id_estado_alquiler])
 );
+
+CREATE TABLE [DROP_TABLE].[Alquiler_Estado](
+	[id_estado_alquiler] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[nombre] [varchar](100) NOT NULL,
+);
+
+
+CREATE TABLE [DROP_TABLE].[Detalle_Importe_Alquiler](
+	[id_detalle_alquiler] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[fecha_pago_alquiler] [date] NOT NULL ,
+	[fecha_inicio_periodo] [date] ,
+	[fecha_fin_periodo] [date] ,
+	[importe] [int] NOT NULL ,
+	[id_alquiler] [int] ,
+	CONSTRAINT fk_alquiler_detalle_importe_alquiler FOREIGN KEY ([id_alquiler]) REFERENCES [DROP_TABLE].[Alquiler]([id_alquiler])
+)
 
 CREATE TABLE [DROP_TABLE].[Moneda](
 	[id_moneda] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
@@ -131,8 +155,6 @@ CREATE TABLE [DROP_TABLE].[Moneda](
 CREATE TABLE [DROP_TABLE].[Tipo_Operacion](
 	[id_tipo_operacion] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	[nombre] [varchar](100) NOT NULL,
-
-
 )
 
 CREATE TABLE [DROP_TABLE].[Inquilino](
@@ -154,15 +176,15 @@ CREATE TABLE [DROP_TABLE].[Persona](
 	[fecha_nacimiento] [date] ,
 )
 
-	CREATE TABLE [DROP_TABLE].[Agente](
+CREATE TABLE [DROP_TABLE].[Agente](
 	[id_agente] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	[id_persona] [int] ,
 	CONSTRAINT fk_agente_persona FOREIGN KEY ([id_persona]) REFERENCES [DROP_TABLE].[Persona]([id_persona]),
 	[id_sucursal] [int] ,
 	CONSTRAINT fk_agente_sucursal FOREIGN KEY ([id_sucursal]) REFERENCES [DROP_TABLE].[Sucursal]([id_sucursal])
-	)
+)
 
-	CREATE TABLE [DROP_TABLE].[Anuncio](
+CREATE TABLE [DROP_TABLE].[Anuncio](
 	[id_anuncio] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	[fecha_Aplicacion] [date] ,
 	[tipo_operacion] [varchar](100) NOT NULL,
@@ -179,19 +201,54 @@ CREATE TABLE [DROP_TABLE].[Persona](
 	CONSTRAINT fk_tipo_operacion FOREIGN KEY ([id_tipo_operacion]) REFERENCES [DROP_TABLE].[Tipo_Operacion]([id_tipo_operacion]),
 	[id_estado_anuncio] [int] ,
 	CONSTRAINT fk_estado_anuncio FOREIGN KEY ([id_estado_anuncio]) REFERENCES [DROP_TABLE].[Estado_Anuncio]([id_estado_anuncio]),
+	[id_medio_pago] [int] ,
+	CONSTRAINT fk_medio_pago_anuncio FOREIGN KEY ([id_medio_pago]) REFERENCES [DROP_TABLE].[Medio_Pago]([id_medio_pago])
+)
 
+CREATE TABLE [DROP_TABLE].[Medio_Pago](
+	[id_medio_pago] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[nombre] [varchar](100) NOT NULL,
+)
+
+CREATE TABLE [DROP_TABLE].[Pago_Alquiler](
+	[id_pago_alquiler] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[fecha_pago_alquiler] [date] NOT NULL ,
+	[fecha_inicio_periodo] [date] ,
+	[fecha_fin_periodo] [date] ,
+	[nro_periodo] [int] ,
+	[cantidad_periodos] [int] ,
+	[importe] [int] NOT NULL ,
+	[id_alquiler] [int] ,
+	CONSTRAINT fk_alquiler_pago_alquiler FOREIGN KEY ([id_alquiler]) REFERENCES [DROP_TABLE].[Alquiler]([id_alquiler])
+	[id_medio_pago] [int] ,
+	CONSTRAINT fk_medio_pago_alquiler FOREIGN KEY ([id_medio_pago]) REFERENCES [DROP_TABLE].[Medio_Pago]([id_medio_pago])
+)
+
+CREATE TABLE [DROP_TABLE].[Pago_Venta](
+	[id_pago_venta] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[fecha_pago] [date] NOT NULL ,
+	[importe] [int] NOT NULL ,
+	[cotizacion] [int] NOT NULL ,
+	[id_medio_pago] [int] ,
+	CONSTRAINT fk_medio_pago_venta FOREIGN KEY ([id_medio_pago]) REFERENCES [DROP_TABLE].[Medio_Pago]([id_medio_pago])
+	[id_moneda] [int] ,
+	CONSTRAINT fk_moneda_pago_venta FOREIGN KEY ([id_moneda]) REFERENCES [DROP_TABLE].[Moneda]([id_moneda]),
+	[id_venta] [int] ,
+	CONSTRAINT fk_venta_pago_venta FOREIGN KEY ([id_venta]) REFERENCES [DROP_TABLE].[Venta]([id_venta]),
+	[id_persona] [int],
+	CONSTRAINT fk_persona_pago_venta FOREIGN KEY ([id_persona]) REFERENCES [DROP_TABLE].[Persona]([id_persona])
 )
 
 
-	CREATE TABLE [DROP_TABLE].[Propietario](
+CREATE TABLE [DROP_TABLE].[Propietario](
 	[id_propietario] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	[id_persona] [int] NULL,
 	CONSTRAINT fk_propietario_persona FOREIGN KEY ([id_persona]) REFERENCES [DROP_TABLE].[Persona]([id_persona]),
 	[id_inmueble] [int] NULL,
 	CONSTRAINT fk_propietario_inmueble FOREIGN KEY ([id_inmueble]) REFERENCES [DROP_TABLE].[Inmueble]([id_inmueble])
-	)
+)
 
-	CREATE TABLE [DROP_TABLE].[Venta](
+CREATE TABLE [DROP_TABLE].[Venta](
 	[id_venta] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	[fecha_venta] [date] ,
 	[precio_venta] [int] ,
