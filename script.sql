@@ -21,6 +21,7 @@ SELECT name
 FROM sys.schemas;
 
 
+
 USE [GD2C2023]
 SET
 ANSI_NULLS ON
@@ -140,10 +141,11 @@ CREATE TABLE [DROP_TABLE].[Persona](
 1) PRIMARY KEY NOT NULL,
 	[nombre] [varchar](100) NOT NULL,
 	[apellido] [varchar](100) NOT NULL,
+	[dni] int not null,
 	[telefono] [int] ,
-	[mail] [varchar](25) NOT NULL,
+	[mail] [varchar](255) NOT NULL,
 	[fecha_alta] [date] ,
-	[fecha_nacimiento] [date] ,
+	[fecha_nacimiento] [date]
 )
 
 CREATE TABLE [DROP_TABLE].[Agente](
@@ -312,22 +314,18 @@ from
 where
 	ANUNCIO_TIPO_OPERACION is not null 
 
-INSERT
-	INTO
-	[DROP_TABLE].[Medio_Pago] (nombre) (
-	select
-		DISTINCT(PAGO_ALQUILER_MEDIO_PAGO)
-	from
-		gd_esquema.Maestra
-	where
-		PAGO_ALQUILER_MEDIO_PAGO is not null
-union
-	select
-		DISTINCT(PAGO_VENTA_MEDIO_PAGO)
-	from
-		gd_esquema.Maestra
-	where
-		PAGO_VENTA_MEDIO_PAGO is not null)
+INSERT INTO [DROP_TABLE].[Medio_Pago] (nombre)
+SELECT DISTINCT medio_pago
+FROM (
+    SELECT PAGO_ALQUILER_MEDIO_PAGO AS medio_pago
+    FROM gd_esquema.Maestra
+    WHERE PAGO_ALQUILER_MEDIO_PAGO IS NOT NULL
+    UNION ALL
+    SELECT PAGO_VENTA_MEDIO_PAGO AS medio_pago
+    FROM gd_esquema.Maestra
+    WHERE PAGO_VENTA_MEDIO_PAGO IS NOT NULL
+) AS MediosPago;
+
 
 INSERT
 	INTO
@@ -339,29 +337,21 @@ from
 where
 	INMUEBLE_ORIENTACION is not null
 
-INSERT
-	INTO
-	[DROP_TABLE].[Moneda] (nombre) (
-	select
-		DISTINCT(ANUNCIO_MONEDA)
-	from
-		gd_esquema.Maestra
-	where
-		ANUNCIO_MONEDA is not null
-union
-	select
-		DISTINCT(VENTA_MONEDA)
-	from
-		gd_esquema.Maestra
-	where
-		VENTA_MONEDA is not null
-union
-	select
-		DISTINCT(PAGO_VENTA_MONEDA)
-	from
-		gd_esquema.Maestra
-	where
-		PAGO_VENTA_MONEDA is not null)
+INSERT INTO [DROP_TABLE].[Moneda] (nombre)
+SELECT DISTINCT moneda
+FROM (
+    SELECT ANUNCIO_MONEDA AS moneda
+    FROM gd_esquema.Maestra
+    WHERE ANUNCIO_MONEDA IS NOT NULL
+    UNION ALL
+    SELECT VENTA_MONEDA AS moneda
+    FROM gd_esquema.Maestra
+    WHERE VENTA_MONEDA IS NOT NULL
+    UNION ALL
+    SELECT PAGO_VENTA_MONEDA AS moneda
+    FROM gd_esquema.Maestra
+    WHERE PAGO_VENTA_MONEDA IS NOT NULL
+) AS Monedas;
 
 INSERT
 	INTO
@@ -373,29 +363,19 @@ from
 where
 	INMUEBLE_BARRIO is not null
 
-INSERT
-	INTO
-	[DROP_TABLE].[Localidad] (nombre,
-	id_barrio) (
-	select
-		DISTINCT(INMUEBLE_LOCALIDAD),
-		barrio.id_barrio
-	from
-		gd_esquema.Maestra maestra
-	inner join [DROP_TABLE].[Barrio] barrio on
-		maestra.INMUEBLE_BARRIO = barrio.nombre
-	where
-		INMUEBLE_LOCALIDAD is not null
-union
-	select
-		DISTINCT(SUCURSAL_LOCALIDAD),
-		barrio.id_barrio
-	from
-		gd_esquema.Maestra maestra
-	inner join [DROP_TABLE].[Barrio] barrio on
-		maestra.INMUEBLE_BARRIO = barrio.nombre
-	where
-		INMUEBLE_LOCALIDAD is not null)
+INSERT INTO [DROP_TABLE].[Localidad] (nombre, id_barrio)
+SELECT DISTINCT localidad, id_barrio
+FROM (
+    SELECT INMUEBLE_LOCALIDAD AS localidad, barrio.id_barrio
+    FROM gd_esquema.Maestra maestra
+    INNER JOIN [DROP_TABLE].[Barrio] barrio ON maestra.INMUEBLE_BARRIO = barrio.nombre
+    WHERE INMUEBLE_LOCALIDAD IS NOT NULL
+    UNION ALL
+    SELECT SUCURSAL_LOCALIDAD AS localidad, barrio.id_barrio
+    FROM gd_esquema.Maestra maestra
+    INNER JOIN [DROP_TABLE].[Barrio] barrio ON maestra.INMUEBLE_BARRIO = barrio.nombre
+    WHERE SUCURSAL_LOCALIDAD IS NOT NULL
+) AS Localidades;
 		
 INSERT
 	INTO
@@ -442,4 +422,34 @@ inner join [DROP_TABLE].[Provincia] provincia on
 inner join [DROP_TABLE].[Localidad] localidad on
 		maestra.SUCURSAL_LOCALIDAD = localidad.nombre
 where
-		SUCURSAL_CODIGO is not nulladd 
+		SUCURSAL_CODIGO is not null
+		
+		
+INSERT
+	INTO
+	[DROP_TABLE].[Persona] (dni, nombre, telefono,
+mail,
+fecha_nacimiento, fecha_alta, apellido) 
+SELECT DISTINCT dni, nombre, telefono, mail, fecha_registro, fecha_nac, apellido
+FROM (
+    SELECT PROPIETARIO_DNI AS dni, PROPIETARIO_NOMBRE AS nombre, PROPIETARIO_TELEFONO AS telefono, PROPIETARIO_MAIL AS mail, PROPIETARIO_FECHA_REGISTRO AS fecha_registro, PROPIETARIO_FECHA_NAC AS fecha_nac, PROPIETARIO_APELLIDO AS apellido
+    FROM gd_esquema.Maestra
+    WHERE PROPIETARIO_DNI IS NOT NULL
+
+    UNION
+
+    SELECT AGENTE_DNI AS dni, AGENTE_NOMBRE AS nombre, AGENTE_TELEFONO AS telefono, AGENTE_MAIL AS mail, AGENTE_FECHA_REGISTRO AS fecha_registro, AGENTE_FECHA_NAC AS fecha_nac, AGENTE_APELLIDO AS apellido
+    FROM gd_esquema.Maestra
+    WHERE AGENTE_DNI IS NOT NULL
+
+    UNION
+
+    SELECT COMPRADOR_DNI AS dni, COMPRADOR_NOMBRE AS nombre, COMPRADOR_TELEFONO AS telefono, COMPRADOR_MAIL AS mail, COMPRADOR_FECHA_REGISTRO AS fecha_registro, COMPRADOR_FECHA_NAC AS fecha_nac, COMPRADOR_APELLIDO AS apellido
+    FROM gd_esquema.Maestra
+    WHERE COMPRADOR_DNI IS NOT NULL
+
+    UNION
+
+    SELECT INQUILINO_DNI AS dni, INQUILINO_NOMBRE AS nombre, INQUILINO_TELEFONO AS telefono, INQUILINO_MAIL AS mail, INQUILINO_FECHA_REGISTRO AS fecha_registro, INQUILINO_FECHA_NAC AS fecha_nac, INQUILINO_APELLIDO AS apellido
+    FROM gd_esquema.Maestra
+    WHERE INQUILINO_DNI IS NOT NULL) As PERSONAS
