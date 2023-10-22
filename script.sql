@@ -168,9 +168,7 @@ CREATE TABLE [DROP_TABLE].[Anuncio](
 	[id_tipo_operacion] [int] ,
 	CONSTRAINT fk_tipo_operacion FOREIGN KEY ([id_tipo_operacion]) REFERENCES [DROP_TABLE].[Tipo_Operacion]([id_tipo_operacion]),
 	[id_estado_anuncio] [int] ,
-	CONSTRAINT fk_estado_anuncio FOREIGN KEY ([id_estado_anuncio]) REFERENCES [DROP_TABLE].[Estado_Anuncio]([id_estado_anuncio]),
-	[id_medio_pago] [int] ,
-	CONSTRAINT fk_medio_pago_anuncio FOREIGN KEY ([id_medio_pago]) REFERENCES [DROP_TABLE].[Medio_Pago]([id_medio_pago])
+	CONSTRAINT fk_estado_anuncio FOREIGN KEY ([id_estado_anuncio]) REFERENCES [DROP_TABLE].[Estado_Anuncio]([id_estado_anuncio])
 )
 CREATE TABLE [DROP_TABLE].[Alquiler_Estado](
 	[id_estado_alquiler] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
