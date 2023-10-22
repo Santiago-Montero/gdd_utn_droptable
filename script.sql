@@ -442,4 +442,4 @@ inner join [DROP_TABLE].[Provincia] provincia on
 inner join [DROP_TABLE].[Localidad] localidad on
 		maestra.SUCURSAL_LOCALIDAD = localidad.nombre
 where
-		SUCURSAL_CODIGO is not null
+		SUCURSAL_CODIGO is not nulladd 
