@@ -156,7 +156,6 @@ CREATE TABLE [DROP_TABLE].[Medio_Pago](
 CREATE TABLE [DROP_TABLE].[Anuncio](
 	[id_anuncio] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	[fecha_Aplicacion] [date] ,
-	[tipo_operacion] [varchar](100) NOT NULL,
 	[precio_anuncio] [int] ,
 	[costoPublicacion] [int] ,
 	[fecha_Finalizacion] [date] ,
