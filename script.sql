@@ -261,3 +261,158 @@ CREATE TABLE [DROP_TABLE].[Pago_Venta](
 	[id_persona] [int],
 	CONSTRAINT fk_persona_pago_venta FOREIGN KEY ([id_persona]) REFERENCES [DROP_TABLE].[Persona]([id_persona])
 )
+
+
+
+-- INSERTS 
+
+INSERT
+	INTO
+	[DROP_TABLE].[Tipo_inmueble] (nombre)
+select
+	DISTINCT(INMUEBLE_TIPO_INMUEBLE)
+from
+	gd_esquema.Maestra
+where
+	INMUEBLE_TIPO_INMUEBLE is not null 
+
+INSERT
+	INTO
+	[DROP_TABLE].[Tipo_Operacion] (nombre)
+select
+	DISTINCT(ANUNCIO_TIPO_OPERACION)
+from
+	gd_esquema.Maestra
+where
+	ANUNCIO_TIPO_OPERACION is not null 
+
+INSERT
+	INTO
+	[DROP_TABLE].[Medio_Pago] (nombre) (
+	select
+		DISTINCT(PAGO_ALQUILER_MEDIO_PAGO)
+	from
+		gd_esquema.Maestra
+	where
+		PAGO_ALQUILER_MEDIO_PAGO is not null
+union
+	select
+		DISTINCT(PAGO_VENTA_MEDIO_PAGO)
+	from
+		gd_esquema.Maestra
+	where
+		PAGO_VENTA_MEDIO_PAGO is not null)
+
+INSERT
+	INTO
+	[DROP_TABLE].[Orientacion] (nombre)
+select
+	DISTINCT(INMUEBLE_ORIENTACION)
+from
+	gd_esquema.Maestra
+where
+	INMUEBLE_ORIENTACION is not null
+
+INSERT
+	INTO
+	[DROP_TABLE].[Moneda] (nombre) (
+	select
+		DISTINCT(ANUNCIO_MONEDA)
+	from
+		gd_esquema.Maestra
+	where
+		ANUNCIO_MONEDA is not null
+union
+	select
+		DISTINCT(VENTA_MONEDA)
+	from
+		gd_esquema.Maestra
+	where
+		VENTA_MONEDA is not null
+union
+	select
+		DISTINCT(PAGO_VENTA_MONEDA)
+	from
+		gd_esquema.Maestra
+	where
+		PAGO_VENTA_MONEDA is not null)
+
+INSERT
+	INTO
+	[DROP_TABLE].[Barrio] (nombre)
+select
+	DISTINCT(INMUEBLE_BARRIO)
+from
+	gd_esquema.Maestra
+where
+	INMUEBLE_BARRIO is not null
+
+INSERT
+	INTO
+	[DROP_TABLE].[Localidad] (nombre,
+	id_barrio) (
+	select
+		DISTINCT(INMUEBLE_LOCALIDAD),
+		barrio.id_barrio
+	from
+		gd_esquema.Maestra maestra
+	inner join [DROP_TABLE].[Barrio] barrio on
+		maestra.INMUEBLE_BARRIO = barrio.nombre
+	where
+		INMUEBLE_LOCALIDAD is not null
+union
+	select
+		DISTINCT(SUCURSAL_LOCALIDAD),
+		barrio.id_barrio
+	from
+		gd_esquema.Maestra maestra
+	inner join [DROP_TABLE].[Barrio] barrio on
+		maestra.INMUEBLE_BARRIO = barrio.nombre
+	where
+		INMUEBLE_LOCALIDAD is not null)
+		
+INSERT
+	INTO
+	[DROP_TABLE].[Provincia] (nombre,
+	id_localidad) (
+	select
+		DISTINCT(INMUEBLE_PROVINCIA),
+		localidad.id_localidad
+	from
+		gd_esquema.Maestra maestra
+	inner join [DROP_TABLE].[Localidad] localidad on
+		maestra.INMUEBLE_LOCALIDAD = localidad.nombre
+where
+		INMUEBLE_PROVINCIA is not null
+union
+	select
+		DISTINCT(SUCURSAL_PROVINCIA),
+		localidad.id_localidad
+	from
+		gd_esquema.Maestra maestra
+	inner join [DROP_TABLE].[Localidad] localidad on
+		maestra.INMUEBLE_LOCALIDAD = localidad.nombre
+where
+		SUCURSAL_PROVINCIA is not null)
+		
+		
+	INSERT
+	INTO
+	[DROP_TABLE].[Sucursal] (codigo,
+	direccion,
+	nombre, telefono, id_barrio)	
+		select
+		DISTINCT(SUCURSAL_CODIGO),
+		SUCURSAL_DIRECCION,
+SUCURSAL_NOMBRE,
+SUCURSAL_TELEFONO,
+		localidad.id_barrio 
+	from
+		gd_esquema.Maestra maestra
+	inner join [DROP_TABLE].[Provincia] provincia on
+		maestra.SUCURSAL_PROVINCIA = provincia.nombre
+	inner join [DROP_TABLE].[Localidad] localidad on
+		maestra.SUCURSAL_LOCALIDAD  = localidad.nombre
+where
+		SUCURSAL_CODIGO is not null
+		
