@@ -266,6 +266,8 @@ CREATE TABLE [DROP_TABLE].[Pago_Venta](
 
 -- INSERTS 
 
+
+
 INSERT
 	INTO
 	[DROP_TABLE].[Tipo_inmueble] (nombre)
@@ -382,7 +384,7 @@ INSERT
 		gd_esquema.Maestra maestra
 	inner join [DROP_TABLE].[Localidad] localidad on
 		maestra.INMUEBLE_LOCALIDAD = localidad.nombre
-where
+	where
 		INMUEBLE_PROVINCIA is not null
 union
 	select
@@ -392,7 +394,7 @@ union
 		gd_esquema.Maestra maestra
 	inner join [DROP_TABLE].[Localidad] localidad on
 		maestra.INMUEBLE_LOCALIDAD = localidad.nombre
-where
+	where
 		SUCURSAL_PROVINCIA is not null)
 		
 		
@@ -400,19 +402,20 @@ where
 	INTO
 	[DROP_TABLE].[Sucursal] (codigo,
 	direccion,
-	nombre, telefono, id_barrio)	
+	nombre,
+	telefono,
+	id_barrio)	
 		select
 		DISTINCT(SUCURSAL_CODIGO),
 		SUCURSAL_DIRECCION,
-SUCURSAL_NOMBRE,
-SUCURSAL_TELEFONO,
-		localidad.id_barrio 
-	from
+	SUCURSAL_NOMBRE,
+	SUCURSAL_TELEFONO,
+		localidad.id_barrio
+from
 		gd_esquema.Maestra maestra
-	inner join [DROP_TABLE].[Provincia] provincia on
+inner join [DROP_TABLE].[Provincia] provincia on
 		maestra.SUCURSAL_PROVINCIA = provincia.nombre
-	inner join [DROP_TABLE].[Localidad] localidad on
-		maestra.SUCURSAL_LOCALIDAD  = localidad.nombre
+inner join [DROP_TABLE].[Localidad] localidad on
+		maestra.SUCURSAL_LOCALIDAD = localidad.nombre
 where
 		SUCURSAL_CODIGO is not null
-		
