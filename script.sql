@@ -294,6 +294,7 @@ CREATE TABLE [DROP_TABLE].[Pago_Venta](
 
 
 
+
 INSERT
 	INTO
 	[DROP_TABLE].[Tipo_inmueble] (nombre)
@@ -303,6 +304,17 @@ from
 	gd_esquema.Maestra
 where
 	INMUEBLE_TIPO_INMUEBLE is not null 
+	
+
+INSERT
+	INTO
+	[DROP_TABLE].[Inmueble_estado] (nombre)
+select
+	DISTINCT(INMUEBLE_ESTADO)
+from
+	gd_esquema.Maestra
+where
+	INMUEBLE_ESTADO is not null
 
 INSERT
 	INTO
