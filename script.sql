@@ -601,8 +601,8 @@ WHERE
 INSERT INTO [DROP_TABLE].[Propietario] (id_persona , id_inmueble)
 SELECT DISTINCT p.id_persona , i.id_inmueble
 FROM gd_esquema.Maestra m
-INNER JOIN [DROP_TABLE].[Persona] p ON p.id_persona = m.PROPIETARIO_DNI
-INNER JOIN [DROP_TABLE].[Inmueble] i ON i.id_inmueble = m.INMUEBLE_CODIGO
+INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.PROPIETARIO_DNI
+INNER JOIN [DROP_TABLE].[Inmueble] i ON i.codigo = m.INMUEBLE_CODIGO
 WHERE m.INMUEBLE_CODIGO IS NOT NULL and m.PROPIETARIO_DNI IS NOT NULL;
 
 INSERT
