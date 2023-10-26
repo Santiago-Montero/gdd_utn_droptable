@@ -597,3 +597,34 @@ LEFT JOIN [DROP_TABLE].[Caracteristicas] c ON
 WHERE
     m.INMUEBLE_CODIGO IS NOT NULL
     AND (m.INMUEBLE_CARACTERISTICA_WIFI = 1 OR m.INMUEBLE_CARACTERISTICA_CABLE = 1 OR m.INMUEBLE_CARACTERISTICA_CALEFACCION = 1 OR m.INMUEBLE_CARACTERISTICA_GAS = 1)
+
+INSERT INTO [DROP_TABLE].[Propietario] (id_persona , id_inmueble)
+SELECT DISTINCT p.id_persona , i.id_inmueble
+FROM gd_esquema.Maestra m
+INNER JOIN [DROP_TABLE].[Persona] p ON p.id_persona = m.PROPIETARIO_DNI
+INNER JOIN [DROP_TABLE].[Inmueble] i ON i.id_inmueble = m.INMUEBLE_CODIGO
+WHERE m.INMUEBLE_CODIGO IS NOT NULL and m.PROPIETARIO_DNI IS NOT NULL;
+
+INSERT
+	INTO
+	[DROP_TABLE].[Alquiler_Estado] (nombre)
+select
+	DISTINCT(Alquiler_Estado)
+from
+	gd_esquema.Maestra
+where
+	Alquiler_Estado is not null
+
+	INSERT INTO [DROP_TABLE].[Inquilino] (id_persona , id_alquiler)
+SELECT DISTINCT p.id_persona , a._id_alquiler
+FROM gd_esquema.Maestra m 
+INNER JOIN [DROP_TABLE].[Persona] p ON p.id_persona = m.INQUILINO_DNI
+INNER JOIN [DROP_TABLE].[Alquiler] a ON i.id_alquiler = m.ALQUILER_CODIGO
+WHERE m.ALQUILER_CODIGO IS NOT NULL and m.INQUILINO_DNI IS NOT NULL;
+
+INSERT INTO [DROP_TABLE].[Comprador] (id_persona , id_venta)
+SELECT DISTINCT p.id_persona , v._id_venta
+FROM gd_esquema.Maestra m 
+INNER JOIN [DROP_TABLE].[Persona] p ON p.id_persona = m.COMPRADOR_DNI
+INNER JOIN [DROP_TABLE].[Venta] a ON v.id_venta = m.VENTA_CODIGO
+WHERE m.VENTA_CODIGO IS NOT NULL and m.COMPRADOR_DNI IS NOT NULL;
