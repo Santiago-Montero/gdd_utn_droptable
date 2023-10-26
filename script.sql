@@ -618,13 +618,13 @@ where
 	INSERT INTO [DROP_TABLE].[Inquilino] (id_persona , id_alquiler)
 SELECT DISTINCT p.id_persona , a._id_alquiler
 FROM gd_esquema.Maestra m 
-INNER JOIN [DROP_TABLE].[Persona] p ON p.id_persona = m.INQUILINO_DNI
+INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.INQUILINO_DNI
 INNER JOIN [DROP_TABLE].[Alquiler] a ON i.id_alquiler = m.ALQUILER_CODIGO
 WHERE m.ALQUILER_CODIGO IS NOT NULL and m.INQUILINO_DNI IS NOT NULL;
 
 INSERT INTO [DROP_TABLE].[Comprador] (id_persona , id_venta)
 SELECT DISTINCT p.id_persona , v._id_venta
 FROM gd_esquema.Maestra m 
-INNER JOIN [DROP_TABLE].[Persona] p ON p.id_persona = m.COMPRADOR_DNI
+INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.COMPRADOR_DNI
 INNER JOIN [DROP_TABLE].[Venta] a ON v.id_venta = m.VENTA_CODIGO
 WHERE m.VENTA_CODIGO IS NOT NULL and m.COMPRADOR_DNI IS NOT NULL;
