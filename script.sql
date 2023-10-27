@@ -55,28 +55,29 @@ CREATE TABLE [DROP_TABLE].[Estado_anuncio](
 [nombre] VARCHAR(100) NOT NULL
 )
 
-
-CREATE TABLE [DROP_TABLE].[Barrio](
-[id_barrio] [int] IDENTITY(1,
+CREATE TABLE [DROP_TABLE].[Provincia](
+[id_provincia] [int] IDENTITY(1,
 1) PRIMARY KEY,
-[nombre] VARCHAR(100) NOT NULL
+[nombre] VARCHAR(100) NOT NULL,
 );
 
 CREATE TABLE [DROP_TABLE].[Localidad](
 [id_localidad] [int] IDENTITY(1,
 1) PRIMARY KEY,
 [nombre] VARCHAR(100) NOT NULL,
-[id_barrio] [int],
-CONSTRAINT fk_localidad_barrio FOREIGN KEY ([id_barrio]) REFERENCES [DROP_TABLE].[Barrio]([id_barrio])
-);
+[id_provincia] [int],
+CONSTRAINT fk_localidad_provincia FOREIGN KEY ([id_provincia]) REFERENCES [DROP_TABLE].[Provincia]([id_provincia])
 
-CREATE TABLE [DROP_TABLE].[Provincia](
-[id_provincia] [int] IDENTITY(1,
+);
+CREATE TABLE [DROP_TABLE].[Barrio](
+[id_barrio] [int] IDENTITY(1,
 1) PRIMARY KEY,
 [nombre] VARCHAR(100) NOT NULL,
 [id_localidad] [int],
-CONSTRAINT fk_provincia_localidad FOREIGN KEY ([id_localidad]) REFERENCES [DROP_TABLE].[Localidad]([id_localidad])
+CONSTRAINT fk_barrio_localidad FOREIGN KEY ([id_localidad]) REFERENCES [DROP_TABLE].[Localidad]([id_localidad])
 );
+
+
 
 CREATE TABLE [DROP_TABLE].[Inmueble](
 [id_inmueble] [int] IDENTITY(1,
@@ -393,69 +394,80 @@ UNION ALL
 		PAGO_VENTA_MONEDA IS NOT NULL
 ) AS Monedas;
 
-INSERT
-	INTO
-	[DROP_TABLE].[Barrio] (nombre)
-select
-	DISTINCT(INMUEBLE_BARRIO)
-from
-	gd_esquema.Maestra
-where
-	INMUEBLE_BARRIO is not null
 
 INSERT
 	INTO
+	[DROP_TABLE].[Provincia] (nombre) (
+	select
+		DISTINCT(INMUEBLE_PROVINCIA)
+		--localidad.id_localidad
+	from
+		gd_esquema.Maestra maestra
+	-- inner join [DROP_TABLE].[Localidad] localidad on
+	--	maestra.INMUEBLE_LOCALIDAD = localidad.nombre
+	where
+		INMUEBLE_PROVINCIA is not null
+union
+	select
+		DISTINCT(SUCURSAL_PROVINCIA)
+		--localidad.id_localidad
+	from
+		gd_esquema.Maestra maestra
+	--inner join [DROP_TABLE].[Localidad] localidad on
+	--	maestra.INMUEBLE_LOCALIDAD = localidad.nombre
+	where
+		SUCURSAL_PROVINCIA is not null)
+		
+		
+		INSERT
+	INTO
 	[DROP_TABLE].[Localidad] (nombre,
-	id_barrio)
+	id_provincia)
 SELECT
 	DISTINCT localidad,
-	id_barrio
+	id_provincia 
 FROM
 	(
 	SELECT
 		INMUEBLE_LOCALIDAD AS localidad,
-		barrio.id_barrio
+		provincia.id_provincia 
 	FROM
 		gd_esquema.Maestra maestra
-	INNER JOIN [DROP_TABLE].[Barrio] barrio ON
-		maestra.INMUEBLE_BARRIO = barrio.nombre
+	INNER JOIN [DROP_TABLE].[Provincia] provincia ON
+		maestra.INMUEBLE_PROVINCIA  = provincia.nombre
 	WHERE
 		INMUEBLE_LOCALIDAD IS NOT NULL
 UNION ALL
 	SELECT
 		SUCURSAL_LOCALIDAD AS localidad,
-		barrio.id_barrio
+		provincia.id_provincia 
 	FROM
 		gd_esquema.Maestra maestra
-	INNER JOIN [DROP_TABLE].[Barrio] barrio ON
-		maestra.INMUEBLE_BARRIO = barrio.nombre
+	INNER JOIN [DROP_TABLE].[Provincia] provincia ON
+		maestra.SUCURSAL_PROVINCIA = provincia.nombre
 	WHERE
 		SUCURSAL_LOCALIDAD IS NOT NULL
 ) AS Localidades;
 
 INSERT
 	INTO
-	[DROP_TABLE].[Provincia] (nombre,
-	id_localidad) (
-	select
-		DISTINCT(INMUEBLE_PROVINCIA),
-		localidad.id_localidad
-	from
+	[DROP_TABLE].[Barrio] (nombre, id_localidad)
+SELECT
+	DISTINCT barrio,
+	id_localidad  
+FROM
+	(
+	SELECT
+		INMUEBLE_BARRIO AS barrio,
+		localidad.id_localidad 
+	FROM
 		gd_esquema.Maestra maestra
-	inner join [DROP_TABLE].[Localidad] localidad on
-		maestra.INMUEBLE_LOCALIDAD = localidad.nombre
-	where
-		INMUEBLE_PROVINCIA is not null
-union
-	select
-		DISTINCT(SUCURSAL_PROVINCIA),
-		localidad.id_localidad
-	from
-		gd_esquema.Maestra maestra
-	inner join [DROP_TABLE].[Localidad] localidad on
-		maestra.INMUEBLE_LOCALIDAD = localidad.nombre
-	where
-		SUCURSAL_PROVINCIA is not null)
+	INNER JOIN [DROP_TABLE].[Localidad] localidad ON
+		maestra.INMUEBLE_LOCALIDAD   = localidad.nombre
+	WHERE
+		INMUEBLE_BARRIO IS NOT NULL
+) AS Barrios;
+
 
 
 INSERT
@@ -466,19 +478,26 @@ INSERT
 	telefono,
 	id_barrio)
 select
-	DISTINCT(SUCURSAL_CODIGO),
+	DISTINCT 
+	SUCURSAL_CODIGO,
 	SUCURSAL_DIRECCION,
 	SUCURSAL_NOMBRE,
 	SUCURSAL_TELEFONO,
-	localidad.id_barrio
+	SUCURSAL_PROVINCIA,
+	SUCURSAL_LOCALIDAD
+	barrio.id_barrio
 from
 	gd_esquema.Maestra maestra
 inner join [DROP_TABLE].[Provincia] provincia on
 	maestra.SUCURSAL_PROVINCIA = provincia.nombre
 inner join [DROP_TABLE].[Localidad] localidad on
 	maestra.SUCURSAL_LOCALIDAD = localidad.nombre
+inner join [DROP_TABLE].[Barrio] barrio on
+	barrio.id_localidad = localidad.id_localidad 
 where
 	SUCURSAL_CODIGO is not null
+	
+
 
 INSERT
 	INTO
