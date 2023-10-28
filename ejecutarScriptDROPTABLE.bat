@@ -1,0 +1,1 @@
+sqlcmd -S localhost\SQLSERVER2019  -i script.sql -a 32767 -o resultado_output.txt
