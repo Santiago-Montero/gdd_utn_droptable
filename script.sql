@@ -1,27 +1,3 @@
-USE GD2C2023; 
-
-DECLARE @SchemaName NVARCHAR(128) = 'DROP_TABLE';
-DECLARE @SQL NVARCHAR(MAX);
-
-IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = @SchemaName)
-BEGIN
-    SET @SQL = 'CREATE SCHEMA ' + QUOTENAME(@SchemaName);
-    PRINT 'El esquema ' + QUOTENAME(@SchemaName) + ' ha sido creado.';
-    EXEC sp_executesql @SQL;
-END
-ELSE
-BEGIN
-    PRINT 'El esquema ' + QUOTENAME(@SchemaName) + ' ya existía.';
-END;
-
-
-USE GD2C2023;
-
-SELECT name
-FROM sys.schemas;
-
-
-
 USE [GD2C2023]
 SET
 ANSI_NULLS ON
@@ -123,9 +99,7 @@ CREATE TABLE [DROP_TABLE].[Sucursal](
 [nombre] VARCHAR(100) NOT NULL,
 [codigo] VARCHAR(100) NOT NULL,
 [telefono] int,
-[direccion] VARCHAR(100) NOT NULL,
-[id_barrio] [int],
-CONSTRAINT fk_sucursal_barrio FOREIGN KEY ([id_barrio]) REFERENCES [DROP_TABLE].[Barrio]([id_barrio])
+[direccion] VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE [DROP_TABLE].[Moneda](
@@ -475,25 +449,22 @@ INSERT
 	[DROP_TABLE].[Sucursal] (codigo,
 	direccion,
 	nombre,
-	telefono,
-	id_barrio)
+	telefono)
 select
 	DISTINCT 
 	SUCURSAL_CODIGO,
 	SUCURSAL_DIRECCION,
 	SUCURSAL_NOMBRE,
-	SUCURSAL_TELEFONO,
-	SUCURSAL_PROVINCIA,
-	SUCURSAL_LOCALIDAD
-	barrio.id_barrio
+	SUCURSAL_TELEFONO
+	--barrio.id_barrio
 from
 	gd_esquema.Maestra maestra
 inner join [DROP_TABLE].[Provincia] provincia on
 	maestra.SUCURSAL_PROVINCIA = provincia.nombre
 inner join [DROP_TABLE].[Localidad] localidad on
 	maestra.SUCURSAL_LOCALIDAD = localidad.nombre
-inner join [DROP_TABLE].[Barrio] barrio on
-	barrio.id_localidad = localidad.id_localidad 
+--inner join [DROP_TABLE].[Barrio] barrio on
+	--barrio.id_localidad = localidad.id_localidad 
 where
 	SUCURSAL_CODIGO is not null
 	
@@ -586,14 +557,29 @@ UNION
 
 
 INSERT INTO [DROP_TABLE].[Inmueble] (codigo, nombre, descripcion, direccion, superficie, antiguedad, expensas, ambientes, id_inmueble_estado, id_tipo_inmueble, id_disposicion, id_orientacion, id_barrio)
-SELECT DISTINCT INMUEBLE_CODIGO, INMUEBLE_NOMBRE, INMUEBLE_DESCRIPCION, INMUEBLE_DIRECCION, INMUEBLE_SUPERFICIETOTAL, INMUEBLE_ANTIGUEDAD, INMUEBLE_EXPESAS, INMUEBLE_CANT_AMBIENTES, ie.id_inmueble_estado, ti.id_tipo_inmueble, d.id_disposicion, o.id_orientacion, b.id_barrio
+SELECT DISTINCT 
+INMUEBLE_CODIGO, 
+INMUEBLE_NOMBRE,
+INMUEBLE_BARRIO,
+INMUEBLE_LOCALIDAD,
+INMUEBLE_DESCRIPCION,
+INMUEBLE_DIRECCION, 
+INMUEBLE_SUPERFICIETOTAL,
+INMUEBLE_ANTIGUEDAD, 
+INMUEBLE_EXPESAS, 
+INMUEBLE_CANT_AMBIENTES,
+ie.id_inmueble_estado, ti.id_tipo_inmueble, d.id_disposicion, o.id_orientacion,
+b.id_barrio
 FROM gd_esquema.Maestra
 INNER JOIN [DROP_TABLE].[Inmueble_estado] ie ON ie.nombre = INMUEBLE_ESTADO
 INNER JOIN [DROP_TABLE].[Tipo_inmueble] ti ON ti.nombre = INMUEBLE_TIPO_INMUEBLE
 INNER JOIN [DROP_TABLE].[Disposicion] d ON d.nombre = INMUEBLE_DISPOSICION
 INNER JOIN [DROP_TABLE].[Orientacion] o ON o.nombre = INMUEBLE_ORIENTACION
 INNER JOIN [DROP_TABLE].[Barrio] b ON b.nombre = INMUEBLE_BARRIO
-WHERE INMUEBLE_CODIGO IS NOT NULL;
+INNER JOIN [DROP_TABLE].[Localidad]  l ON l.nombre  = INMUEBLE_LOCALIDAD and b.id_localidad = l.id_localidad 
+INNER JOIN [DROP_TABLE].[Provincia] p ON p.nombre  = INMUEBLE_PROVINCIA and p.id_provincia  = l.id_provincia  
+
+
 
 
 INSERT INTO [DROP_TABLE].[Caracteristicas] (caracteristica) VALUES
@@ -618,32 +604,50 @@ WHERE
     AND (m.INMUEBLE_CARACTERISTICA_WIFI = 1 OR m.INMUEBLE_CARACTERISTICA_CABLE = 1 OR m.INMUEBLE_CARACTERISTICA_CALEFACCION = 1 OR m.INMUEBLE_CARACTERISTICA_GAS = 1)
 
 INSERT INTO [DROP_TABLE].[Propietario] (id_persona , id_inmueble)
-SELECT DISTINCT p.id_persona , i.id_inmueble
+SELECT DISTINCT 
+p.id_persona, 
+i.id_inmueble
 FROM gd_esquema.Maestra m
 INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.PROPIETARIO_DNI
-INNER JOIN [DROP_TABLE].[Inmueble] i ON i.codigo = m.INMUEBLE_CODIGO
-WHERE m.INMUEBLE_CODIGO IS NOT NULL and m.PROPIETARIO_DNI IS NOT NULL;
+INNER JOIN [DROP_TABLE].[Inmueble] i ON i.codigo = m.INMUEBLE_CODIGO 
+WHERE m.INMUEBLE_CODIGO IS NOT NULL and id_persona = 1
+
+SELECT DISTINCT PROPIETARIO_DNI, PROPIETARIO_NOMBRE ,INMUEBLE_CODIGO
+FROM gd_esquema.Maestra m
+WHERE  m.PROPIETARIO_DNI = 1121086
+
+
 
 INSERT
 	INTO
 	[DROP_TABLE].[Alquiler_Estado] (nombre)
 select
-	DISTINCT(Alquiler_Estado)
+	DISTINCT(ALQUILER_ESTADO)
 from
 	gd_esquema.Maestra
 where
-	Alquiler_Estado is not null
+	ALQUILER_ESTADO is not null
+	
+	INSERT
+	INTO
+	[DROP_TABLE].[Estado_anuncio] (nombre)
+select
+	DISTINCT(ANUNCIO_ESTADO)
+from
+	gd_esquema.Maestra
+where
+	 ANUNCIO_ESTADO is not null
 
 	INSERT INTO [DROP_TABLE].[Inquilino] (id_persona , id_alquiler)
-SELECT DISTINCT p.id_persona , a._id_alquiler
+SELECT DISTINCT p.id_persona , a.id_alquiler
 FROM gd_esquema.Maestra m 
 INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.INQUILINO_DNI
-INNER JOIN [DROP_TABLE].[Alquiler] a ON i.id_alquiler = m.ALQUILER_CODIGO
-WHERE m.ALQUILER_CODIGO IS NOT NULL and m.INQUILINO_DNI IS NOT NULL;
+INNER JOIN [DROP_TABLE].[Alquiler] a ON a.id_alquiler = m.ALQUILER_CODIGO
+WHERE m.ALQUILER_CODIGO IS NOT NULL and m.INQUILINO_DNI IS NOT NULL
 
 INSERT INTO [DROP_TABLE].[Comprador] (id_persona , id_venta)
-SELECT DISTINCT p.id_persona , v._id_venta
+SELECT DISTINCT p.id_persona , v.id_venta
 FROM gd_esquema.Maestra m 
 INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.COMPRADOR_DNI
-INNER JOIN [DROP_TABLE].[Venta] a ON v.id_venta = m.VENTA_CODIGO
-WHERE m.VENTA_CODIGO IS NOT NULL and m.COMPRADOR_DNI IS NOT NULL;
+INNER JOIN [DROP_TABLE].[Venta] v ON v.id_venta = m.VENTA_CODIGO
+WHERE m.VENTA_CODIGO IS NOT NULL and m.COMPRADOR_DNI IS NOT NULL
