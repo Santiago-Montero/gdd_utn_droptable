@@ -1,7 +1,5 @@
 USE GD2C2023;
---DECLARE @SchemaName NVARCHAR(128) = 'gd_esquema';
-DECLARE @SchemaName NVARCHAR(128) = 'DROP_TABLE';
-
+DECLARE @SchemaName NVARCHAR(128) = 'DropTable';
 DECLARE @SQL NVARCHAR(MAX);
 
 IF NOT EXISTS (
@@ -37,58 +35,58 @@ ANSI_NULLS ON
 SET
 QUOTED_IDENTIFIER ON
 
-CREATE TABLE [DROP_TABLE].[Disposicion](
+CREATE TABLE [DropTable].[Disposicion](
 [id_disposicion] [int] IDENTITY(1,
 1) primary key,
 [nombre] VARCHAR(100) NOT NULL,
 )
-CREATE TABLE [DROP_TABLE].[Orientacion](
+CREATE TABLE [DropTable].[Orientacion](
 [id_orientacion] [int] IDENTITY(1,
 1) primary key,
 [nombre] VARCHAR(100) NOT NULL
 )
-CREATE TABLE [DROP_TABLE].[Tipo_inmueble](
+CREATE TABLE [DropTable].[Tipo_inmueble](
 [id_tipo_inmueble] [int] IDENTITY(1,
 1) primary key,
 [nombre] VARCHAR(100) NOT NULL
 )
-CREATE TABLE [DROP_TABLE].[Inmueble_estado](
+CREATE TABLE [DropTable].[Inmueble_estado](
 [id_inmueble_estado] [int] IDENTITY(1,
 1) primary key,
 [nombre] VARCHAR(100) NOT NULL
 )
 
-CREATE TABLE [DROP_TABLE].[Estado_anuncio](
+CREATE TABLE [DropTable].[Estado_anuncio](
 [id_estado_anuncio] [int] IDENTITY(1,
 1) primary key,
 [nombre] VARCHAR(100) NOT NULL
 )
 
-CREATE TABLE [DROP_TABLE].[Provincia](
+CREATE TABLE [DropTable].[Provincia](
 [id_provincia] [int] IDENTITY(1,
 1) PRIMARY KEY,
 [nombre] VARCHAR(100) NOT NULL,
 );
 
-CREATE TABLE [DROP_TABLE].[Localidad](
+CREATE TABLE [DropTable].[Localidad](
 [id_localidad] [int] IDENTITY(1,
 1) PRIMARY KEY,
 [nombre] VARCHAR(100) NOT NULL,
 [id_provincia] [int],
-CONSTRAINT fk_localidad_provincia FOREIGN KEY ([id_provincia]) REFERENCES [DROP_TABLE].[Provincia]([id_provincia])
+CONSTRAINT fk_localidad_provincia FOREIGN KEY ([id_provincia]) REFERENCES [DropTable].[Provincia]([id_provincia])
 
 );
-CREATE TABLE [DROP_TABLE].[Barrio](
+CREATE TABLE [DropTable].[Barrio](
 [id_barrio] [int] IDENTITY(1,
 1) PRIMARY KEY,
 [nombre] VARCHAR(100) NOT NULL,
 [id_localidad] [int],
-CONSTRAINT fk_barrio_localidad FOREIGN KEY ([id_localidad]) REFERENCES [DROP_TABLE].[Localidad]([id_localidad])
+CONSTRAINT fk_barrio_localidad FOREIGN KEY ([id_localidad]) REFERENCES [DropTable].[Localidad]([id_localidad])
 );
 
 
 
-CREATE TABLE [DROP_TABLE].[Inmueble](
+CREATE TABLE [DropTable].[Inmueble](
 [id_inmueble] [int] IDENTITY(1,
 1) PRIMARY KEY,
 [nombre] VARCHAR(100) NOT NULL,
@@ -100,33 +98,33 @@ CREATE TABLE [DROP_TABLE].[Inmueble](
 [superficie] int,
 [antiguedad] int,
 [id_disposicion] [int],
-CONSTRAINT fk_disposicion FOREIGN KEY ([id_disposicion]) REFERENCES [DROP_TABLE].[Disposicion]([id_disposicion]),
+CONSTRAINT fk_disposicion FOREIGN KEY ([id_disposicion]) REFERENCES [DropTable].[Disposicion]([id_disposicion]),
 [id_orientacion] [int],
-CONSTRAINT fk_orientacion FOREIGN KEY ([id_orientacion]) REFERENCES [DROP_TABLE].[Orientacion]([id_orientacion]),
+CONSTRAINT fk_orientacion FOREIGN KEY ([id_orientacion]) REFERENCES [DropTable].[Orientacion]([id_orientacion]),
 [id_tipo_inmueble] [int],
-CONSTRAINT fk_tipo_inmueble FOREIGN KEY ([id_tipo_inmueble]) REFERENCES [DROP_TABLE].[Tipo_inmueble]([id_tipo_inmueble]),
+CONSTRAINT fk_tipo_inmueble FOREIGN KEY ([id_tipo_inmueble]) REFERENCES [DropTable].[Tipo_inmueble]([id_tipo_inmueble]),
 [id_inmueble_estado] [int],
-CONSTRAINT fk_inmueble_estado FOREIGN KEY ([id_inmueble_estado]) REFERENCES [DROP_TABLE].[Inmueble_estado]([id_inmueble_estado]),
+CONSTRAINT fk_inmueble_estado FOREIGN KEY ([id_inmueble_estado]) REFERENCES [DropTable].[Inmueble_estado]([id_inmueble_estado]),
 [id_barrio] [int],
-CONSTRAINT fk_barrio FOREIGN KEY ([id_barrio]) REFERENCES [DROP_TABLE].[Barrio]([id_barrio]),
+CONSTRAINT fk_barrio FOREIGN KEY ([id_barrio]) REFERENCES [DropTable].[Barrio]([id_barrio]),
 )
-CREATE TABLE [DROP_TABLE].[Caracteristicas](
+CREATE TABLE [DropTable].[Caracteristicas](
 [id_caracteristicas] [int] IDENTITY(1,
 1) primary key,
 [caracteristica] VARCHAR(100) NOT NULL
 )
-CREATE TABLE [DROP_TABLE].[Caracteristicas_por_inmueble](
+CREATE TABLE [DropTable].[Caracteristicas_por_inmueble](
 [id_caracteristicas_por_inmueble] [int] IDENTITY(1,
 1) primary key,
 [id_inmueble] [int],
-CONSTRAINT fk_inmueble FOREIGN KEY ([id_inmueble]) REFERENCES [DROP_TABLE].[Inmueble]([id_inmueble]),
+CONSTRAINT fk_inmueble FOREIGN KEY ([id_inmueble]) REFERENCES [DropTable].[Inmueble]([id_inmueble]),
 [id_caracteristicas] [int],
-CONSTRAINT fk_caracteristicas FOREIGN KEY ([id_caracteristicas]) REFERENCES [DROP_TABLE].[Caracteristicas]([id_caracteristicas])
+CONSTRAINT fk_caracteristicas FOREIGN KEY ([id_caracteristicas]) REFERENCES [DropTable].[Caracteristicas]([id_caracteristicas])
 )
 
 
 
-CREATE TABLE [DROP_TABLE].[Sucursal](
+CREATE TABLE [DropTable].[Sucursal](
 [id_sucursal] [int] IDENTITY(1,
 1) PRIMARY KEY,
 [nombre] VARCHAR(100) NOT NULL,
@@ -135,13 +133,13 @@ CREATE TABLE [DROP_TABLE].[Sucursal](
 [direccion] VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE [DROP_TABLE].[Moneda](
+CREATE TABLE [DropTable].[Moneda](
 [id_moneda] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [nombre] [varchar](100) NOT NULL,
 )
 
-CREATE TABLE [DROP_TABLE].[Tipo_Operacion](
+CREATE TABLE [DropTable].[Tipo_Operacion](
 [id_tipo_operacion] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [nombre] [varchar](100) NOT NULL,
@@ -150,7 +148,7 @@ CREATE TABLE [DROP_TABLE].[Tipo_Operacion](
 
 
 
-CREATE TABLE [DROP_TABLE].[Persona](
+CREATE TABLE [DropTable].[Persona](
 [id_persona] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [nombre] [varchar](100) NOT NULL,
@@ -162,22 +160,22 @@ CREATE TABLE [DROP_TABLE].[Persona](
 [fecha_nacimiento] [date]
 )
 
-CREATE TABLE [DROP_TABLE].[Agente](
+CREATE TABLE [DropTable].[Agente](
 [id_agente] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [id_persona] [int] ,
-CONSTRAINT fk_agente_persona FOREIGN KEY ([id_persona]) REFERENCES [DROP_TABLE].[Persona]([id_persona]),
+CONSTRAINT fk_agente_persona FOREIGN KEY ([id_persona]) REFERENCES [DropTable].[Persona]([id_persona]),
 [id_sucursal] [int] ,
-CONSTRAINT fk_agente_sucursal FOREIGN KEY ([id_sucursal]) REFERENCES [DROP_TABLE].[Sucursal]([id_sucursal])
+CONSTRAINT fk_agente_sucursal FOREIGN KEY ([id_sucursal]) REFERENCES [DropTable].[Sucursal]([id_sucursal])
 )
 
-CREATE TABLE [DROP_TABLE].[Medio_Pago](
+CREATE TABLE [DropTable].[Medio_Pago](
 [id_medio_pago] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [nombre] [varchar](100) NOT NULL,
 )
 
-CREATE TABLE [DROP_TABLE].[Anuncio](
+CREATE TABLE [DropTable].[Anuncio](
 [id_anuncio] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [fecha_publicacion] [date] ,
@@ -186,23 +184,23 @@ CREATE TABLE [DROP_TABLE].[Anuncio](
 [costoPublicacion] [int] ,
 [fecha_Finalizacion] [date] ,
 [id_agente] [int] ,
-CONSTRAINT fk_anuncio_agente FOREIGN KEY ([id_agente]) REFERENCES [DROP_TABLE].[Agente]([id_agente]),
+CONSTRAINT fk_anuncio_agente FOREIGN KEY ([id_agente]) REFERENCES [DropTable].[Agente]([id_agente]),
 [id_inmueble] [int] ,
-CONSTRAINT fk_anuncio_inmueble FOREIGN KEY ([id_inmueble]) REFERENCES [DROP_TABLE].Inmueble([id_inmueble]),
+CONSTRAINT fk_anuncio_inmueble FOREIGN KEY ([id_inmueble]) REFERENCES [DropTable].Inmueble([id_inmueble]),
 [id_moneda] [int] ,
-CONSTRAINT fk_moneda_anuncio FOREIGN KEY ([id_moneda]) REFERENCES [DROP_TABLE].[Moneda]([id_moneda]),
+CONSTRAINT fk_moneda_anuncio FOREIGN KEY ([id_moneda]) REFERENCES [DropTable].[Moneda]([id_moneda]),
 [id_tipo_operacion] [int] ,
-CONSTRAINT fk_tipo_operacion FOREIGN KEY ([id_tipo_operacion]) REFERENCES [DROP_TABLE].[Tipo_Operacion]([id_tipo_operacion]),
+CONSTRAINT fk_tipo_operacion FOREIGN KEY ([id_tipo_operacion]) REFERENCES [DropTable].[Tipo_Operacion]([id_tipo_operacion]),
 [id_estado_anuncio] [int] ,
-CONSTRAINT fk_estado_anuncio FOREIGN KEY ([id_estado_anuncio]) REFERENCES [DROP_TABLE].[Estado_Anuncio]([id_estado_anuncio])
+CONSTRAINT fk_estado_anuncio FOREIGN KEY ([id_estado_anuncio]) REFERENCES [DropTable].[Estado_Anuncio]([id_estado_anuncio])
 )
-CREATE TABLE [DROP_TABLE].[Alquiler_Estado](
+CREATE TABLE [DropTable].[Alquiler_Estado](
 [id_estado_alquiler] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [nombre] [varchar](100) NOT NULL,
 );
 
-CREATE TABLE [DROP_TABLE].[Alquiler](
+CREATE TABLE [DropTable].[Alquiler](
 [id_alquiler] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [fecha_inicio] [date] ,
@@ -212,34 +210,34 @@ CREATE TABLE [DROP_TABLE].[Alquiler](
 [gastos] [int] ,
 [codigo] [int] ,
 [id_anuncio] [int] ,
-CONSTRAINT fk_alquiler_anuncio FOREIGN KEY ([id_anuncio]) REFERENCES [DROP_TABLE].Anuncio([id_anuncio]),
+CONSTRAINT fk_alquiler_anuncio FOREIGN KEY ([id_anuncio]) REFERENCES [DropTable].Anuncio([id_anuncio]),
 [id_estado_alquiler] [int] ,
-CONSTRAINT fk_estado_alquiler FOREIGN KEY ([id_estado_alquiler]) REFERENCES [DROP_TABLE].[Alquiler_Estado]([id_estado_alquiler])
+CONSTRAINT fk_estado_alquiler FOREIGN KEY ([id_estado_alquiler]) REFERENCES [DropTable].[Alquiler_Estado]([id_estado_alquiler])
 );
 
-CREATE TABLE [DROP_TABLE].[Detalle_Importe_Alquiler](
+CREATE TABLE [DropTable].[Detalle_Importe_Alquiler](
 [id_detalle_alquiler] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [numero_inicio_periodo] [int] ,
 [numero_fin_periodo] [int] ,
 [importe] [int] NOT NULL ,
 [id_alquiler] [int] ,
-CONSTRAINT fk_alquiler_detalle_importe_alquiler FOREIGN KEY ([id_alquiler]) REFERENCES [DROP_TABLE].[Alquiler]([id_alquiler])
+CONSTRAINT fk_alquiler_detalle_importe_alquiler FOREIGN KEY ([id_alquiler]) REFERENCES [DropTable].[Alquiler]([id_alquiler])
 )
 
-CREATE TABLE [DROP_TABLE].[Inquilino](
+CREATE TABLE [DropTable].[Inquilino](
 [id_inquilino] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [id_persona] [int] ,
-CONSTRAINT fk_persona_inquilino FOREIGN KEY ([id_persona]) REFERENCES [DROP_TABLE].[Persona]([id_persona]),
+CONSTRAINT fk_persona_inquilino FOREIGN KEY ([id_persona]) REFERENCES [DropTable].[Persona]([id_persona]),
 [id_alquiler] [int] ,
-CONSTRAINT fk_alquiler_inquilino FOREIGN KEY ([id_alquiler]) REFERENCES [DROP_TABLE].[Alquiler]([id_alquiler])
+CONSTRAINT fk_alquiler_inquilino FOREIGN KEY ([id_alquiler]) REFERENCES [DropTable].[Alquiler]([id_alquiler])
 )
 
 
 
 
-CREATE TABLE [DROP_TABLE].[Pago_Alquiler](
+CREATE TABLE [DropTable].[Pago_Alquiler](
 [id_pago_alquiler] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [fecha_pago_alquiler] [date] NOT NULL ,
@@ -250,24 +248,24 @@ CREATE TABLE [DROP_TABLE].[Pago_Alquiler](
 [nro_periodo] [int] ,
 [importe] [int] NOT NULL ,
 [id_alquiler] [int] ,
-CONSTRAINT fk_alquiler_pago_alquiler FOREIGN KEY ([id_alquiler]) REFERENCES [DROP_TABLE].[Alquiler]([id_alquiler]),
+CONSTRAINT fk_alquiler_pago_alquiler FOREIGN KEY ([id_alquiler]) REFERENCES [DropTable].[Alquiler]([id_alquiler]),
 [id_medio_pago] [int] ,
-CONSTRAINT fk_medio_pago_alquiler FOREIGN KEY ([id_medio_pago]) REFERENCES [DROP_TABLE].[Medio_Pago]([id_medio_pago])
+CONSTRAINT fk_medio_pago_alquiler FOREIGN KEY ([id_medio_pago]) REFERENCES [DropTable].[Medio_Pago]([id_medio_pago])
 )
 
 
 
 
-CREATE TABLE [DROP_TABLE].[Propietario](
+CREATE TABLE [DropTable].[Propietario](
 [id_propietario] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [id_persona] [int] NULL,
-CONSTRAINT fk_propietario_persona FOREIGN KEY ([id_persona]) REFERENCES [DROP_TABLE].[Persona]([id_persona]),
+CONSTRAINT fk_propietario_persona FOREIGN KEY ([id_persona]) REFERENCES [DropTable].[Persona]([id_persona]),
 [id_inmueble] [int] NULL,
-CONSTRAINT fk_propietario_inmueble FOREIGN KEY ([id_inmueble]) REFERENCES [DROP_TABLE].[Inmueble]([id_inmueble])
+CONSTRAINT fk_propietario_inmueble FOREIGN KEY ([id_inmueble]) REFERENCES [DropTable].[Inmueble]([id_inmueble])
 )
 
-CREATE TABLE [DROP_TABLE].[Venta](
+CREATE TABLE [DropTable].[Venta](
 [id_venta] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [fecha_venta] [date] ,
@@ -275,38 +273,38 @@ CREATE TABLE [DROP_TABLE].[Venta](
 [comision_inmobiliaria] [int] ,
 [codigo] [int] ,
 [id_moneda] [int],
-CONSTRAINT fk_moneda_venta FOREIGN KEY ([id_moneda]) REFERENCES [DROP_TABLE].Moneda([id_moneda]),
+CONSTRAINT fk_moneda_venta FOREIGN KEY ([id_moneda]) REFERENCES [DropTable].Moneda([id_moneda]),
 [id_anuncio] [int] ,
-CONSTRAINT fk_anuncio_venta FOREIGN KEY ([id_anuncio]) REFERENCES [DROP_TABLE].Anuncio([id_anuncio])
+CONSTRAINT fk_anuncio_venta FOREIGN KEY ([id_anuncio]) REFERENCES [DropTable].Anuncio([id_anuncio])
 )
 
-CREATE TABLE [DROP_TABLE].[Comprador](
+CREATE TABLE [DropTable].[Comprador](
 [id_comprador] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [id_persona] [int] NULL,
-CONSTRAINT fk_comprador_persona FOREIGN KEY ([id_persona]) REFERENCES [DROP_TABLE].[Persona]([id_persona]),
+CONSTRAINT fk_comprador_persona FOREIGN KEY ([id_persona]) REFERENCES [DropTable].[Persona]([id_persona]),
 [id_venta] [int] NULL,
-CONSTRAINT fk_venta_inmueble FOREIGN KEY ([id_venta]) REFERENCES [DROP_TABLE].[Venta]([id_venta])
+CONSTRAINT fk_venta_inmueble FOREIGN KEY ([id_venta]) REFERENCES [DropTable].[Venta]([id_venta])
 )
 
-CREATE TABLE [DROP_TABLE].[Pago_Venta](
+CREATE TABLE [DropTable].[Pago_Venta](
 [id_pago_venta] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
 [importe] [int] NOT NULL ,
 [cotizacion] [int] NOT NULL ,
 [id_medio_pago] [int] ,
-CONSTRAINT fk_medio_pago_venta FOREIGN KEY ([id_medio_pago]) REFERENCES [DROP_TABLE].[Medio_Pago]([id_medio_pago]),
+CONSTRAINT fk_medio_pago_venta FOREIGN KEY ([id_medio_pago]) REFERENCES [DropTable].[Medio_Pago]([id_medio_pago]),
 [id_moneda] [int] ,
-CONSTRAINT fk_moneda_pago_venta FOREIGN KEY ([id_moneda]) REFERENCES [DROP_TABLE].[Moneda]([id_moneda]),
+CONSTRAINT fk_moneda_pago_venta FOREIGN KEY ([id_moneda]) REFERENCES [DropTable].[Moneda]([id_moneda]),
 [id_venta] [int] ,
-CONSTRAINT fk_venta_pago_venta FOREIGN KEY ([id_venta]) REFERENCES [DROP_TABLE].[Venta]([id_venta])
+CONSTRAINT fk_venta_pago_venta FOREIGN KEY ([id_venta]) REFERENCES [DropTable].[Venta]([id_venta])
 )
 
 
 
 INSERT
 	INTO
-	[DROP_TABLE].[Tipo_inmueble] (nombre)
+	[DropTable].[Tipo_inmueble] (nombre)
 select
 	DISTINCT(INMUEBLE_TIPO_INMUEBLE)
 from
@@ -317,7 +315,7 @@ where
 
 INSERT
 	INTO
-	[DROP_TABLE].[Inmueble_estado] (nombre)
+	[DropTable].[Inmueble_estado] (nombre)
 select
 	DISTINCT(INMUEBLE_ESTADO)
 from
@@ -327,7 +325,7 @@ where
 
 INSERT
 	INTO
-	[DROP_TABLE].[Tipo_Operacion] (nombre)
+	[DropTable].[Tipo_Operacion] (nombre)
 select
 	DISTINCT(ANUNCIO_TIPO_OPERACION)
 from
@@ -337,7 +335,7 @@ where
 
 INSERT
 	INTO
-	[DROP_TABLE].[Medio_Pago] (nombre)
+	[DropTable].[Medio_Pago] (nombre)
 SELECT
 	DISTINCT medio_pago
 FROM
@@ -359,7 +357,7 @@ UNION ALL
 
 INSERT
 	INTO
-	[DROP_TABLE].[Orientacion] (nombre)
+	[DropTable].[Orientacion] (nombre)
 select
 	DISTINCT(INMUEBLE_ORIENTACION)
 from
@@ -369,7 +367,7 @@ where
 
 INSERT
 	INTO
-	[DROP_TABLE].[Moneda] (nombre)
+	[DropTable].[Moneda] (nombre)
 SELECT
 	DISTINCT moneda
 FROM
@@ -399,13 +397,13 @@ UNION ALL
 
 INSERT
 	INTO
-	[DROP_TABLE].[Provincia] (nombre) (
+	[DropTable].[Provincia] (nombre) (
 	select
 		DISTINCT(INMUEBLE_PROVINCIA)
 		--localidad.id_localidad
 	from
 		gd_esquema.Maestra maestra
-	-- inner join [DROP_TABLE].[Localidad] localidad on
+	-- inner join [DropTable].[Localidad] localidad on
 	--	maestra.INMUEBLE_LOCALIDAD = localidad.nombre
 	where
 		INMUEBLE_PROVINCIA is not null
@@ -415,7 +413,7 @@ union
 		--localidad.id_localidad
 	from
 		gd_esquema.Maestra maestra
-	--inner join [DROP_TABLE].[Localidad] localidad on
+	--inner join [DropTable].[Localidad] localidad on
 	--	maestra.INMUEBLE_LOCALIDAD = localidad.nombre
 	where
 		SUCURSAL_PROVINCIA is not null)
@@ -423,7 +421,7 @@ union
 		
 		INSERT
 	INTO
-	[DROP_TABLE].[Localidad] (nombre,
+	[DropTable].[Localidad] (nombre,
 	id_provincia)
 SELECT
 	DISTINCT localidad,
@@ -435,7 +433,7 @@ FROM
 		provincia.id_provincia 
 	FROM
 		gd_esquema.Maestra maestra
-	INNER JOIN [DROP_TABLE].[Provincia] provincia ON
+	INNER JOIN [DropTable].[Provincia] provincia ON
 		maestra.INMUEBLE_PROVINCIA  = provincia.nombre
 	WHERE
 		INMUEBLE_LOCALIDAD IS NOT NULL
@@ -445,7 +443,7 @@ UNION ALL
 		provincia.id_provincia 
 	FROM
 		gd_esquema.Maestra maestra
-	INNER JOIN [DROP_TABLE].[Provincia] provincia ON
+	INNER JOIN [DropTable].[Provincia] provincia ON
 		maestra.SUCURSAL_PROVINCIA = provincia.nombre
 	WHERE
 		SUCURSAL_LOCALIDAD IS NOT NULL
@@ -453,7 +451,7 @@ UNION ALL
 
 INSERT
 	INTO
-	[DROP_TABLE].[Barrio] (nombre, id_localidad)
+	[DropTable].[Barrio] (nombre, id_localidad)
 SELECT
 	DISTINCT barrio,
 	id_localidad  
@@ -464,7 +462,7 @@ FROM
 		localidad.id_localidad 
 	FROM
 		gd_esquema.Maestra maestra
-	INNER JOIN [DROP_TABLE].[Localidad] localidad ON
+	INNER JOIN [DropTable].[Localidad] localidad ON
 		maestra.INMUEBLE_LOCALIDAD   = localidad.nombre
 	WHERE
 		INMUEBLE_BARRIO IS NOT NULL
@@ -474,7 +472,7 @@ FROM
 
 INSERT
 	INTO
-	[DROP_TABLE].[Sucursal] (codigo,
+	[DropTable].[Sucursal] (codigo,
 	direccion,
 	nombre,
 	telefono)
@@ -487,11 +485,11 @@ select
 	--barrio.id_barrio
 from
 	gd_esquema.Maestra maestra
-inner join [DROP_TABLE].[Provincia] provincia on
+inner join [DropTable].[Provincia] provincia on
 	maestra.SUCURSAL_PROVINCIA = provincia.nombre
-inner join [DROP_TABLE].[Localidad] localidad on
+inner join [DropTable].[Localidad] localidad on
 	maestra.SUCURSAL_LOCALIDAD = localidad.nombre
---inner join [DROP_TABLE].[Barrio] barrio on
+--inner join [DropTable].[Barrio] barrio on
 	--barrio.id_localidad = localidad.id_localidad 
 where
 	SUCURSAL_CODIGO is not null
@@ -500,7 +498,7 @@ where
 
 INSERT
 	INTO
-	[DROP_TABLE].[Disposicion] (nombre)
+	[DropTable].[Disposicion] (nombre)
 select
 	DISTINCT(INMUEBLE_DISPOSICION)
 from
@@ -511,7 +509,7 @@ where
 
 INSERT
 	INTO
-	[DROP_TABLE].[Persona] (dni,
+	[DropTable].[Persona] (dni,
 	nombre,
 	telefono,
 	mail,
@@ -584,7 +582,7 @@ UNION
 
 
 
-INSERT INTO [DROP_TABLE].[Inmueble] (codigo, nombre, descripcion, direccion, superficie, antiguedad, expensas, ambientes, id_inmueble_estado, id_tipo_inmueble, id_disposicion, id_orientacion, id_barrio)
+INSERT INTO [DropTable].[Inmueble] (codigo, nombre, descripcion, direccion, superficie, antiguedad, expensas, ambientes, id_inmueble_estado, id_tipo_inmueble, id_disposicion, id_orientacion, id_barrio)
 SELECT DISTINCT 
 INMUEBLE_CODIGO, 
 INMUEBLE_NOMBRE,
@@ -597,18 +595,18 @@ INMUEBLE_CANT_AMBIENTES,
 ie.id_inmueble_estado, ti.id_tipo_inmueble, d.id_disposicion, o.id_orientacion,
 b.id_barrio
 FROM gd_esquema.Maestra
-INNER JOIN [DROP_TABLE].[Inmueble_estado] ie ON ie.nombre = INMUEBLE_ESTADO
-INNER JOIN [DROP_TABLE].[Tipo_inmueble] ti ON ti.nombre = INMUEBLE_TIPO_INMUEBLE
-INNER JOIN [DROP_TABLE].[Disposicion] d ON d.nombre = INMUEBLE_DISPOSICION
-INNER JOIN [DROP_TABLE].[Orientacion] o ON o.nombre = INMUEBLE_ORIENTACION
-INNER JOIN [DROP_TABLE].[Barrio] b ON b.nombre = INMUEBLE_BARRIO
-INNER JOIN [DROP_TABLE].[Localidad]  l ON l.nombre  = INMUEBLE_LOCALIDAD and b.id_localidad = l.id_localidad 
-INNER JOIN [DROP_TABLE].[Provincia] p ON p.nombre  = INMUEBLE_PROVINCIA and p.id_provincia  = l.id_provincia  
+INNER JOIN [DropTable].[Inmueble_estado] ie ON ie.nombre = INMUEBLE_ESTADO
+INNER JOIN [DropTable].[Tipo_inmueble] ti ON ti.nombre = INMUEBLE_TIPO_INMUEBLE
+INNER JOIN [DropTable].[Disposicion] d ON d.nombre = INMUEBLE_DISPOSICION
+INNER JOIN [DropTable].[Orientacion] o ON o.nombre = INMUEBLE_ORIENTACION
+INNER JOIN [DropTable].[Barrio] b ON b.nombre = INMUEBLE_BARRIO
+INNER JOIN [DropTable].[Localidad]  l ON l.nombre  = INMUEBLE_LOCALIDAD and b.id_localidad = l.id_localidad 
+INNER JOIN [DropTable].[Provincia] p ON p.nombre  = INMUEBLE_PROVINCIA and p.id_provincia  = l.id_provincia  
 
 
 
 
-INSERT INTO [DROP_TABLE].[Caracteristicas] (caracteristica) VALUES
+INSERT INTO [DropTable].[Caracteristicas] (caracteristica) VALUES
 ('Wifi'),
 ('Cable'),
 ('Calefacción'),
@@ -616,11 +614,11 @@ INSERT INTO [DROP_TABLE].[Caracteristicas] (caracteristica) VALUES
 
 
 
-INSERT INTO [DROP_TABLE].[Caracteristicas_por_inmueble] (id_inmueble, id_caracteristicas)
+INSERT INTO [DropTable].[Caracteristicas_por_inmueble] (id_inmueble, id_caracteristicas)
 SELECT inmueble.id_inmueble, c.id_caracteristicas
 FROM gd_esquema.Maestra m
-INNER JOIN [DROP_TABLE].[Inmueble] inmueble ON m.INMUEBLE_CODIGO = inmueble.codigo
-LEFT JOIN [DROP_TABLE].[Caracteristicas] c ON
+INNER JOIN [DropTable].[Inmueble] inmueble ON m.INMUEBLE_CODIGO = inmueble.codigo
+LEFT JOIN [DropTable].[Caracteristicas] c ON
     (m.INMUEBLE_CARACTERISTICA_WIFI = 1 AND c.caracteristica = 'Wifi') OR
     (m.INMUEBLE_CARACTERISTICA_CABLE = 1 AND c.caracteristica = 'Cable') OR
     (m.INMUEBLE_CARACTERISTICA_CALEFACCION = 1 AND c.caracteristica = 'Calefacción') OR
@@ -631,7 +629,7 @@ WHERE
 
 INSERT
 	INTO
-	[DROP_TABLE].[Alquiler_Estado] (nombre)
+	[DropTable].[Alquiler_Estado] (nombre)
 select
 	DISTINCT(ALQUILER_ESTADO)
 from
@@ -641,7 +639,7 @@ where
 	
 	INSERT
 	INTO
-	[DROP_TABLE].[Estado_anuncio] (nombre)
+	[DropTable].[Estado_anuncio] (nombre)
 select
 	DISTINCT(ANUNCIO_ESTADO)
 from
@@ -649,23 +647,23 @@ from
 where
 	 ANUNCIO_ESTADO is not null
 	 
-	 INSERT INTO [DROP_TABLE].[Agente] (id_persona , id_sucursal)
+	 INSERT INTO [DropTable].[Agente] (id_persona , id_sucursal)
 SELECT DISTINCT p.id_persona , S.id_sucursal
 FROM gd_esquema.Maestra m 
-INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.AGENTE_DNI 
-INNER JOIN [DROP_TABLE].[Sucursal] s ON s.codigo  = m.SUCURSAL_CODIGO 
+INNER JOIN [DropTable].[Persona] p ON p.dni = m.AGENTE_DNI 
+INNER JOIN [DropTable].[Sucursal] s ON s.codigo  = m.SUCURSAL_CODIGO 
 WHERE m.SUCURSAL_CODIGO IS NOT NULL and m.AGENTE_DNI IS NOT NULL
 
-INSERT INTO [DROP_TABLE].[Propietario] (id_persona , id_inmueble)
+INSERT INTO [DropTable].[Propietario] (id_persona , id_inmueble)
 SELECT DISTINCT p.id_persona , i.id_inmueble 
 FROM gd_esquema.Maestra m 
-INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.PROPIETARIO_DNI  
-INNER JOIN [DROP_TABLE].[Inmueble] i ON i.codigo  = m.INMUEBLE_CODIGO  
+INNER JOIN [DropTable].[Persona] p ON p.dni = m.PROPIETARIO_DNI  
+INNER JOIN [DropTable].[Inmueble] i ON i.codigo  = m.INMUEBLE_CODIGO  
 WHERE m.PROPIETARIO_DNI IS NOT NULL and m.INMUEBLE_CODIGO IS NOT NULL
 
 
 
-INSERT INTO [DROP_TABLE].[Anuncio] (
+INSERT INTO [DropTable].[Anuncio] (
 codigo,
 fecha_publicacion,
 precio_anuncio,
@@ -681,12 +679,12 @@ m.ANUNCIO_CODIGO ,
 m.ANUNCIO_FECHA_PUBLICACION, m.ANUNCIO_PRECIO_PUBLICADO, m.ANUNCIO_COSTO_ANUNCIO,
 m.ANUNCIO_FECHA_FINALIZACION, a.id_agente, i.id_inmueble, mo.id_moneda, to2.id_tipo_operacion, ea.id_estado_anuncio
 FROM gd_esquema.Maestra m 
-INNER JOIN [DROP_TABLE].[Persona] p on p.dni  = m.AGENTE_DNI 
-INNER JOIN [DROP_TABLE].[Agente] a on a.id_persona  = p.id_persona 
-INNER JOIN [DROP_TABLE].[Inmueble] i on i.codigo  = m.INMUEBLE_CODIGO
-INNER JOIN [DROP_TABLE].[Moneda] mo on mo.nombre  = m.ANUNCIO_MONEDA 
-INNER JOIN [DROP_TABLE].[Tipo_Operacion] to2 on to2.nombre  = m.ANUNCIO_TIPO_OPERACION 
-INNER JOIN [DROP_TABLE].[Estado_anuncio] ea on ea.nombre  = m.ANUNCIO_ESTADO 
+INNER JOIN [DropTable].[Persona] p on p.dni  = m.AGENTE_DNI 
+INNER JOIN [DropTable].[Agente] a on a.id_persona  = p.id_persona 
+INNER JOIN [DropTable].[Inmueble] i on i.codigo  = m.INMUEBLE_CODIGO
+INNER JOIN [DropTable].[Moneda] mo on mo.nombre  = m.ANUNCIO_MONEDA 
+INNER JOIN [DropTable].[Tipo_Operacion] to2 on to2.nombre  = m.ANUNCIO_TIPO_OPERACION 
+INNER JOIN [DropTable].[Estado_anuncio] ea on ea.nombre  = m.ANUNCIO_ESTADO 
 WHERE m.ANUNCIO_CODIGO  IS NOT NULL and m.AGENTE_DNI is not null and m.INMUEBLE_CODIGO is not NULL
 and  m.ANUNCIO_MONEDA  IS NOT NULL
 and m.ANUNCIO_TIPO_OPERACION  IS NOT NULL
@@ -694,7 +692,7 @@ and  m.ANUNCIO_ESTADO  IS NOT NULL
 
 
 
-INSERT INTO [DROP_TABLE].[Alquiler] (
+INSERT INTO [DropTable].[Alquiler] (
 fecha_inicio,
 fecha_fin,
 deposito,
@@ -707,20 +705,20 @@ id_estado_alquiler
 SELECT DISTINCT m.ALQUILER_FECHA_INICIO, m.ALQUILER_FECHA_FIN, m.ALQUILER_DEPOSITO, m.ALQUILER_COMISION, m.ALQUILER_GASTOS_AVERIGUA, m.ALQUILER_CODIGO,
 a.id_anuncio, ea.id_estado_alquiler
 FROM gd_esquema.Maestra m
-INNER JOIN [DROP_TABLE].[Anuncio] a ON a.codigo  = m.ANUNCIO_CODIGO 
-INNER JOIN [DROP_TABLE].[Alquiler_Estado] ea ON ea.nombre  = m.ALQUILER_ESTADO 
+INNER JOIN [DropTable].[Anuncio] a ON a.codigo  = m.ANUNCIO_CODIGO 
+INNER JOIN [DropTable].[Alquiler_Estado] ea ON ea.nombre  = m.ALQUILER_ESTADO 
 WHERE m.ANUNCIO_CODIGO IS NOT NULL and m.ALQUILER_ESTADO IS NOT NULL
 
-INSERT INTO [DROP_TABLE].[Inquilino] (id_persona , id_alquiler)
+INSERT INTO [DropTable].[Inquilino] (id_persona , id_alquiler)
 SELECT DISTINCT p.id_persona , a.id_alquiler
 FROM gd_esquema.Maestra m 
-INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.INQUILINO_DNI
-INNER JOIN [DROP_TABLE].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO
+INNER JOIN [DropTable].[Persona] p ON p.dni = m.INQUILINO_DNI
+INNER JOIN [DropTable].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO
 WHERE m.ALQUILER_CODIGO IS NOT NULL and m.INQUILINO_DNI IS NOT NULL
 
 
 
-INSERT INTO [DROP_TABLE].[Pago_Alquiler] (
+INSERT INTO [DropTable].[Pago_Alquiler] (
 codigo,
 descripcion,
 fecha_pago_alquiler,
@@ -734,11 +732,11 @@ id_medio_pago
 SELECT DISTINCT m.PAGO_ALQUILER_CODIGO, m.PAGO_ALQUILER_DESC, m.PAGO_ALQUILER_FECHA, m.PAGO_ALQUILER_FEC_INI, m.PAGO_ALQUILER_FEC_FIN, m.PAGO_ALQUILER_NRO_PERIODO, m.PAGO_ALQUILER_IMPORTE,
 a.id_alquiler, mp.id_medio_pago
 FROM gd_esquema.Maestra m
-INNER JOIN [DROP_TABLE].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO  
-INNER JOIN [DROP_TABLE].[Medio_Pago] mp ON mp.nombre  = m.PAGO_ALQUILER_MEDIO_PAGO  
+INNER JOIN [DropTable].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO  
+INNER JOIN [DropTable].[Medio_Pago] mp ON mp.nombre  = m.PAGO_ALQUILER_MEDIO_PAGO  
 WHERE m.ALQUILER_CODIGO IS NOT NULL and m.PAGO_ALQUILER_MEDIO_PAGO IS NOT NULL and  m.PAGO_ALQUILER_CODIGO IS NOT NULL
 
-INSERT INTO [DROP_TABLE].[Detalle_Importe_Alquiler] (
+INSERT INTO [DropTable].[Detalle_Importe_Alquiler] (
 importe,
 numero_inicio_periodo,
 numero_fin_periodo,
@@ -747,11 +745,11 @@ id_alquiler
 SELECT DISTINCT m.DETALLE_ALQ_PRECIO, m.DETALLE_ALQ_NRO_PERIODO_INI, m.DETALLE_ALQ_NRO_PERIODO_FIN,
 a.id_alquiler
 FROM gd_esquema.Maestra m
-INNER JOIN [DROP_TABLE].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO   
+INNER JOIN [DropTable].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO   
 WHERE m.ALQUILER_CODIGO IS NOT NULL and m.DETALLE_ALQ_PRECIO is not null
 
 
-INSERT INTO [DROP_TABLE].[Venta] (
+INSERT INTO [DropTable].[Venta] (
 fecha_venta,
 precio_venta,
 comision_inmobiliaria,
@@ -763,19 +761,19 @@ SELECT DISTINCT m.VENTA_FECHA , m.VENTA_PRECIO_VENTA , m.VENTA_COMISION , m.VENT
 mo.id_moneda,
 a.id_anuncio
 FROM gd_esquema.Maestra m
-INNER JOIN [DROP_TABLE].[Anuncio] a ON a.codigo  = m.ANUNCIO_CODIGO 
-INNER JOIN [DROP_TABLE].[Moneda] mo ON mo.nombre  = m.VENTA_MONEDA  
+INNER JOIN [DropTable].[Anuncio] a ON a.codigo  = m.ANUNCIO_CODIGO 
+INNER JOIN [DropTable].[Moneda] mo ON mo.nombre  = m.VENTA_MONEDA  
 WHERE m.ANUNCIO_CODIGO IS NOT NULL and m.VENTA_CODIGO IS NOT NULL
 
 
-INSERT INTO [DROP_TABLE].[Comprador] (id_persona , id_venta)
+INSERT INTO [DropTable].[Comprador] (id_persona , id_venta)
 SELECT DISTINCT p.id_persona , v.id_venta
 FROM gd_esquema.Maestra m 
-INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.COMPRADOR_DNI
-INNER JOIN [DROP_TABLE].[Venta] v ON v.codigo  = m.VENTA_CODIGO
+INNER JOIN [DropTable].[Persona] p ON p.dni = m.COMPRADOR_DNI
+INNER JOIN [DropTable].[Venta] v ON v.codigo  = m.VENTA_CODIGO
 WHERE m.VENTA_CODIGO IS NOT NULL and m.COMPRADOR_DNI IS NOT NULL
 
-INSERT INTO [DROP_TABLE].[Pago_Venta] (
+INSERT INTO [DropTable].[Pago_Venta] (
 importe,
 cotizacion,
 id_medio_pago,
@@ -785,8 +783,8 @@ id_venta
 SELECT DISTINCT m.PAGO_VENTA_IMPORTE, m.PAGO_VENTA_COTIZACION,
 mp.id_medio_pago , mo.id_moneda, v.id_venta
 FROM gd_esquema.Maestra m
-INNER JOIN [DROP_TABLE].[Moneda] mo ON mo.nombre  = m.PAGO_VENTA_MONEDA  
-INNER JOIN [DROP_TABLE].[Medio_Pago] mp ON mp.nombre  = m.PAGO_VENTA_MEDIO_PAGO 
-INNER JOIN [DROP_TABLE].[Venta] v ON v.codigo  = m.VENTA_CODIGO
+INNER JOIN [DropTable].[Moneda] mo ON mo.nombre  = m.PAGO_VENTA_MONEDA  
+INNER JOIN [DropTable].[Medio_Pago] mp ON mp.nombre  = m.PAGO_VENTA_MEDIO_PAGO 
+INNER JOIN [DropTable].[Venta] v ON v.codigo  = m.VENTA_CODIGO
 WHERE m.VENTA_CODIGO IS NOT NULL and m.PAGO_VENTA_MEDIO_PAGO IS NOT NULL
     

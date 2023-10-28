@@ -1,1 +1,1 @@
-sqlcmd -S localhost\SQLSERVER2019  -i script.sql -a 32767 -o resultado_output.txt
+sqlcmd -S localhost\SQLSERVER2019  -i script_creacion_inicial.sql -a 32767 -o resultado_output.txt
