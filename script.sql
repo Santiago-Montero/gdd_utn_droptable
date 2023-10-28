@@ -1,3 +1,36 @@
+USE GD2C2023;
+--DECLARE @SchemaName NVARCHAR(128) = 'gd_esquema';
+DECLARE @SchemaName NVARCHAR(128) = 'DROP_TABLE';
+
+DECLARE @SQL NVARCHAR(MAX);
+
+IF NOT EXISTS (
+SELECT
+	1
+FROM
+	sys.schemas
+WHERE
+	name = @SchemaName)
+BEGIN
+SET
+@SQL = 'CREATE SCHEMA ' + QUOTENAME(@SchemaName);
+
+PRINT 'El esquema ' + QUOTENAME(@SchemaName) + ' ha sido creado.';
+
+EXEC sp_executesql @SQL;
+END
+ELSE
+BEGIN
+PRINT 'El esquema ' + QUOTENAME(@SchemaName) + ' ya existía.';
+END;
+
+USE GD2C2023;
+
+SELECT
+	name
+FROM
+	sys.schemas;
+
 USE [GD2C2023]
 SET
 ANSI_NULLS ON
@@ -147,8 +180,9 @@ CREATE TABLE [DROP_TABLE].[Medio_Pago](
 CREATE TABLE [DROP_TABLE].[Anuncio](
 [id_anuncio] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
-[fecha_Aplicacion] [date] ,
+[fecha_publicacion] [date] ,
 [precio_anuncio] [int] ,
+[codigo] VARCHAR(100) NOT NULL,
 [costoPublicacion] [int] ,
 [fecha_Finalizacion] [date] ,
 [id_agente] [int] ,
@@ -186,9 +220,8 @@ CONSTRAINT fk_estado_alquiler FOREIGN KEY ([id_estado_alquiler]) REFERENCES [DRO
 CREATE TABLE [DROP_TABLE].[Detalle_Importe_Alquiler](
 [id_detalle_alquiler] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
-[fecha_pago_alquiler] [date] NOT NULL ,
-[fecha_inicio_periodo] [date] ,
-[fecha_fin_periodo] [date] ,
+[numero_inicio_periodo] [int] ,
+[numero_fin_periodo] [int] ,
 [importe] [int] NOT NULL ,
 [id_alquiler] [int] ,
 CONSTRAINT fk_alquiler_detalle_importe_alquiler FOREIGN KEY ([id_alquiler]) REFERENCES [DROP_TABLE].[Alquiler]([id_alquiler])
@@ -212,8 +245,9 @@ CREATE TABLE [DROP_TABLE].[Pago_Alquiler](
 [fecha_pago_alquiler] [date] NOT NULL ,
 [fecha_inicio_periodo] [date] ,
 [fecha_fin_periodo] [date] ,
+[codigo] [int] ,
+[descripcion] [varchar](100) NOT NULL,
 [nro_periodo] [int] ,
-[cantidad_periodos] [int] ,
 [importe] [int] NOT NULL ,
 [id_alquiler] [int] ,
 CONSTRAINT fk_alquiler_pago_alquiler FOREIGN KEY ([id_alquiler]) REFERENCES [DROP_TABLE].[Alquiler]([id_alquiler]),
@@ -258,7 +292,6 @@ CONSTRAINT fk_venta_inmueble FOREIGN KEY ([id_venta]) REFERENCES [DROP_TABLE].[V
 CREATE TABLE [DROP_TABLE].[Pago_Venta](
 [id_pago_venta] [int] IDENTITY(1,
 1) PRIMARY KEY NOT NULL,
-[fecha_pago] [date] NOT NULL ,
 [importe] [int] NOT NULL ,
 [cotizacion] [int] NOT NULL ,
 [id_medio_pago] [int] ,
@@ -266,13 +299,8 @@ CONSTRAINT fk_medio_pago_venta FOREIGN KEY ([id_medio_pago]) REFERENCES [DROP_TA
 [id_moneda] [int] ,
 CONSTRAINT fk_moneda_pago_venta FOREIGN KEY ([id_moneda]) REFERENCES [DROP_TABLE].[Moneda]([id_moneda]),
 [id_venta] [int] ,
-CONSTRAINT fk_venta_pago_venta FOREIGN KEY ([id_venta]) REFERENCES [DROP_TABLE].[Venta]([id_venta]),
-[id_persona] [int],
-CONSTRAINT fk_persona_pago_venta FOREIGN KEY ([id_persona]) REFERENCES [DROP_TABLE].[Persona]([id_persona])
+CONSTRAINT fk_venta_pago_venta FOREIGN KEY ([id_venta]) REFERENCES [DROP_TABLE].[Venta]([id_venta])
 )
-
-
-
 
 
 
@@ -560,8 +588,6 @@ INSERT INTO [DROP_TABLE].[Inmueble] (codigo, nombre, descripcion, direccion, sup
 SELECT DISTINCT 
 INMUEBLE_CODIGO, 
 INMUEBLE_NOMBRE,
-INMUEBLE_BARRIO,
-INMUEBLE_LOCALIDAD,
 INMUEBLE_DESCRIPCION,
 INMUEBLE_DIRECCION, 
 INMUEBLE_SUPERFICIETOTAL,
@@ -603,21 +629,6 @@ WHERE
     m.INMUEBLE_CODIGO IS NOT NULL
     AND (m.INMUEBLE_CARACTERISTICA_WIFI = 1 OR m.INMUEBLE_CARACTERISTICA_CABLE = 1 OR m.INMUEBLE_CARACTERISTICA_CALEFACCION = 1 OR m.INMUEBLE_CARACTERISTICA_GAS = 1)
 
-INSERT INTO [DROP_TABLE].[Propietario] (id_persona , id_inmueble)
-SELECT DISTINCT 
-p.id_persona, 
-i.id_inmueble
-FROM gd_esquema.Maestra m
-INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.PROPIETARIO_DNI
-INNER JOIN [DROP_TABLE].[Inmueble] i ON i.codigo = m.INMUEBLE_CODIGO 
-WHERE m.INMUEBLE_CODIGO IS NOT NULL and id_persona = 1
-
-SELECT DISTINCT PROPIETARIO_DNI, PROPIETARIO_NOMBRE ,INMUEBLE_CODIGO
-FROM gd_esquema.Maestra m
-WHERE  m.PROPIETARIO_DNI = 1121086
-
-
-
 INSERT
 	INTO
 	[DROP_TABLE].[Alquiler_Estado] (nombre)
@@ -637,17 +648,145 @@ from
 	gd_esquema.Maestra
 where
 	 ANUNCIO_ESTADO is not null
+	 
+	 INSERT INTO [DROP_TABLE].[Agente] (id_persona , id_sucursal)
+SELECT DISTINCT p.id_persona , S.id_sucursal
+FROM gd_esquema.Maestra m 
+INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.AGENTE_DNI 
+INNER JOIN [DROP_TABLE].[Sucursal] s ON s.codigo  = m.SUCURSAL_CODIGO 
+WHERE m.SUCURSAL_CODIGO IS NOT NULL and m.AGENTE_DNI IS NOT NULL
 
-	INSERT INTO [DROP_TABLE].[Inquilino] (id_persona , id_alquiler)
+INSERT INTO [DROP_TABLE].[Propietario] (id_persona , id_inmueble)
+SELECT DISTINCT p.id_persona , i.id_inmueble 
+FROM gd_esquema.Maestra m 
+INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.PROPIETARIO_DNI  
+INNER JOIN [DROP_TABLE].[Inmueble] i ON i.codigo  = m.INMUEBLE_CODIGO  
+WHERE m.PROPIETARIO_DNI IS NOT NULL and m.INMUEBLE_CODIGO IS NOT NULL
+
+
+
+INSERT INTO [DROP_TABLE].[Anuncio] (
+codigo,
+fecha_publicacion,
+precio_anuncio,
+costoPublicacion,
+fecha_Finalizacion,
+id_agente,
+id_inmueble,
+id_moneda,
+id_tipo_operacion,
+id_estado_anuncio)
+SELECT DISTINCT 
+m.ANUNCIO_CODIGO ,
+m.ANUNCIO_FECHA_PUBLICACION, m.ANUNCIO_PRECIO_PUBLICADO, m.ANUNCIO_COSTO_ANUNCIO,
+m.ANUNCIO_FECHA_FINALIZACION, a.id_agente, i.id_inmueble, mo.id_moneda, to2.id_tipo_operacion, ea.id_estado_anuncio
+FROM gd_esquema.Maestra m 
+INNER JOIN [DROP_TABLE].[Persona] p on p.dni  = m.AGENTE_DNI 
+INNER JOIN [DROP_TABLE].[Agente] a on a.id_persona  = p.id_persona 
+INNER JOIN [DROP_TABLE].[Inmueble] i on i.codigo  = m.INMUEBLE_CODIGO
+INNER JOIN [DROP_TABLE].[Moneda] mo on mo.nombre  = m.ANUNCIO_MONEDA 
+INNER JOIN [DROP_TABLE].[Tipo_Operacion] to2 on to2.nombre  = m.ANUNCIO_TIPO_OPERACION 
+INNER JOIN [DROP_TABLE].[Estado_anuncio] ea on ea.nombre  = m.ANUNCIO_ESTADO 
+WHERE m.ANUNCIO_CODIGO  IS NOT NULL and m.AGENTE_DNI is not null and m.INMUEBLE_CODIGO is not NULL
+and  m.ANUNCIO_MONEDA  IS NOT NULL
+and m.ANUNCIO_TIPO_OPERACION  IS NOT NULL
+and  m.ANUNCIO_ESTADO  IS NOT NULL
+
+
+
+INSERT INTO [DROP_TABLE].[Alquiler] (
+fecha_inicio,
+fecha_fin,
+deposito,
+comision,
+gastos,
+codigo,
+id_anuncio,
+id_estado_alquiler
+)
+SELECT DISTINCT m.ALQUILER_FECHA_INICIO, m.ALQUILER_FECHA_FIN, m.ALQUILER_DEPOSITO, m.ALQUILER_COMISION, m.ALQUILER_GASTOS_AVERIGUA, m.ALQUILER_CODIGO,
+a.id_anuncio, ea.id_estado_alquiler
+FROM gd_esquema.Maestra m
+INNER JOIN [DROP_TABLE].[Anuncio] a ON a.codigo  = m.ANUNCIO_CODIGO 
+INNER JOIN [DROP_TABLE].[Alquiler_Estado] ea ON ea.nombre  = m.ALQUILER_ESTADO 
+WHERE m.ANUNCIO_CODIGO IS NOT NULL and m.ALQUILER_ESTADO IS NOT NULL
+
+INSERT INTO [DROP_TABLE].[Inquilino] (id_persona , id_alquiler)
 SELECT DISTINCT p.id_persona , a.id_alquiler
 FROM gd_esquema.Maestra m 
 INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.INQUILINO_DNI
-INNER JOIN [DROP_TABLE].[Alquiler] a ON a.id_alquiler = m.ALQUILER_CODIGO
+INNER JOIN [DROP_TABLE].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO
 WHERE m.ALQUILER_CODIGO IS NOT NULL and m.INQUILINO_DNI IS NOT NULL
+
+
+
+INSERT INTO [DROP_TABLE].[Pago_Alquiler] (
+codigo,
+descripcion,
+fecha_pago_alquiler,
+fecha_inicio_periodo,
+fecha_fin_periodo,
+nro_periodo,
+importe,
+id_alquiler,
+id_medio_pago
+)
+SELECT DISTINCT m.PAGO_ALQUILER_CODIGO, m.PAGO_ALQUILER_DESC, m.PAGO_ALQUILER_FECHA, m.PAGO_ALQUILER_FEC_INI, m.PAGO_ALQUILER_FEC_FIN, m.PAGO_ALQUILER_NRO_PERIODO, m.PAGO_ALQUILER_IMPORTE,
+a.id_alquiler, mp.id_medio_pago
+FROM gd_esquema.Maestra m
+INNER JOIN [DROP_TABLE].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO  
+INNER JOIN [DROP_TABLE].[Medio_Pago] mp ON mp.nombre  = m.PAGO_ALQUILER_MEDIO_PAGO  
+WHERE m.ALQUILER_CODIGO IS NOT NULL and m.PAGO_ALQUILER_MEDIO_PAGO IS NOT NULL and  m.PAGO_ALQUILER_CODIGO IS NOT NULL
+
+INSERT INTO [DROP_TABLE].[Detalle_Importe_Alquiler] (
+importe,
+numero_inicio_periodo,
+numero_fin_periodo,
+id_alquiler
+)
+SELECT DISTINCT m.DETALLE_ALQ_PRECIO, m.DETALLE_ALQ_NRO_PERIODO_INI, m.DETALLE_ALQ_NRO_PERIODO_FIN,
+a.id_alquiler
+FROM gd_esquema.Maestra m
+INNER JOIN [DROP_TABLE].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO   
+WHERE m.ALQUILER_CODIGO IS NOT NULL and m.DETALLE_ALQ_PRECIO is not null
+
+
+INSERT INTO [DROP_TABLE].[Venta] (
+fecha_venta,
+precio_venta,
+comision_inmobiliaria,
+codigo,
+id_moneda,
+id_anuncio
+)
+SELECT DISTINCT m.VENTA_FECHA , m.VENTA_PRECIO_VENTA , m.VENTA_COMISION , m.VENTA_CODIGO,
+mo.id_moneda,
+a.id_anuncio
+FROM gd_esquema.Maestra m
+INNER JOIN [DROP_TABLE].[Anuncio] a ON a.codigo  = m.ANUNCIO_CODIGO 
+INNER JOIN [DROP_TABLE].[Moneda] mo ON mo.nombre  = m.VENTA_MONEDA  
+WHERE m.ANUNCIO_CODIGO IS NOT NULL and m.VENTA_CODIGO IS NOT NULL
+
 
 INSERT INTO [DROP_TABLE].[Comprador] (id_persona , id_venta)
 SELECT DISTINCT p.id_persona , v.id_venta
 FROM gd_esquema.Maestra m 
 INNER JOIN [DROP_TABLE].[Persona] p ON p.dni = m.COMPRADOR_DNI
-INNER JOIN [DROP_TABLE].[Venta] v ON v.id_venta = m.VENTA_CODIGO
+INNER JOIN [DROP_TABLE].[Venta] v ON v.codigo  = m.VENTA_CODIGO
 WHERE m.VENTA_CODIGO IS NOT NULL and m.COMPRADOR_DNI IS NOT NULL
+
+INSERT INTO [DROP_TABLE].[Pago_Venta] (
+importe,
+cotizacion,
+id_medio_pago,
+id_moneda,
+id_venta
+)
+SELECT DISTINCT m.PAGO_VENTA_IMPORTE, m.PAGO_VENTA_COTIZACION,
+mp.id_medio_pago , mo.id_moneda, v.id_venta
+FROM gd_esquema.Maestra m
+INNER JOIN [DROP_TABLE].[Moneda] mo ON mo.nombre  = m.PAGO_VENTA_MONEDA  
+INNER JOIN [DROP_TABLE].[Medio_Pago] mp ON mp.nombre  = m.PAGO_VENTA_MEDIO_PAGO 
+INNER JOIN [DROP_TABLE].[Venta] v ON v.codigo  = m.VENTA_CODIGO
+WHERE m.VENTA_CODIGO IS NOT NULL and m.PAGO_VENTA_MEDIO_PAGO IS NOT NULL
+    
