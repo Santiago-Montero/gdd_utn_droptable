@@ -21,20 +21,17 @@ ELSE
 BEGIN
 PRINT 'El esquema ' + QUOTENAME(@SchemaName) + ' ya existía.';
 END;
-
+--Se crea el esquema a utilizar
 USE GD2C2023;
 
-SELECT
-	name
-FROM
-	sys.schemas;
+
 
 USE [GD2C2023]
 SET
 ANSI_NULLS ON
 SET
 QUOTED_IDENTIFIER ON
-
+--Se crea tablas segun el DER entregado en la carpeta
 CREATE TABLE [DropTable].[Disposicion](
 [id_disposicion] [int] IDENTITY(1,
 1) primary key,
