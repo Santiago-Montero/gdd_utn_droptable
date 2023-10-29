@@ -3,24 +3,24 @@ DECLARE @SchemaName NVARCHAR(128) = 'DropTable';
 DECLARE @SQL NVARCHAR(MAX);
 
 IF NOT EXISTS (
-SELECT
+	SELECT
 	1
-FROM
+	FROM
 	sys.schemas
-WHERE
+	WHERE
 	name = @SchemaName)
-BEGIN
-SET
-@SQL = 'CREATE SCHEMA ' + QUOTENAME(@SchemaName);
+	BEGIN
+	SET
+	@SQL = 'CREATE SCHEMA ' + QUOTENAME(@SchemaName);
 
-PRINT 'El esquema ' + QUOTENAME(@SchemaName) + ' ha sido creado.';
+	PRINT 'El esquema ' + QUOTENAME(@SchemaName) + ' ha sido creado.';
 
 EXEC sp_executesql @SQL;
-END
-ELSE
-BEGIN
-PRINT 'El esquema ' + QUOTENAME(@SchemaName) + ' ya existía.';
-END;
+	END
+	ELSE
+	BEGIN
+		PRINT 'El esquema ' + QUOTENAME(@SchemaName) + ' ya existía.';
+	END;
 --Se crea el esquema a utilizar
 USE GD2C2023;
 
@@ -298,7 +298,10 @@ CONSTRAINT fk_venta_pago_venta FOREIGN KEY ([id_venta]) REFERENCES [DropTable].[
 )
 
 
-
+-- Se insertan los datos en las tablas creadas
+-- Para insertar los datos en la tabla tipo_inmueble se utiliza la siguiente consulta
+-- Nos traemos todos los tipos inmuebles diferentes de la tabla Maestra donde su valor
+-- no sea null y los insertamos en la tabla tipo_inmueble
 INSERT
 	INTO
 	[DropTable].[Tipo_inmueble] (nombre)
@@ -310,6 +313,9 @@ where
 	INMUEBLE_TIPO_INMUEBLE is not null
 
 
+-- Para insertar los datos en la tabla inmueble_estado se utiliza la siguiente consulta
+-- Nos traemos todos los estados inmuebles diferentes de la tabla Maestra donde su valor
+-- no sea null y los insertamos en la tabla inmueble_estado
 INSERT
 	INTO
 	[DropTable].[Inmueble_estado] (nombre)
@@ -320,6 +326,10 @@ from
 where
 	INMUEBLE_ESTADO is not null
 
+
+-- Para insertar los datos en la tabla tipo_operacion se utiliza la siguiente consulta
+-- Nos traemos todos los tipos operaciones diferentes de la tabla Maestra donde su valor
+-- no sea null y los insertamos en la tabla tipo_operacion
 INSERT
 	INTO
 	[DropTable].[Tipo_Operacion] (nombre)
@@ -330,6 +340,9 @@ from
 where
 	ANUNCIO_TIPO_OPERACION is not null
 
+-- Para insertar los datos en la tabla medio_pago se utiliza la siguiente consulta
+-- Nos traemos todos los medios de pago diferentes de la tabla Maestra donde su valor
+-- no sea null y los insertamos en la tabla medio_pago
 INSERT
 	INTO
 	[DropTable].[Medio_Pago] (nombre)
@@ -352,6 +365,9 @@ UNION ALL
 		PAGO_VENTA_MEDIO_PAGO IS NOT NULL
 ) AS MediosPago;
 
+-- Para insertar los datos en la tabla orientacion se utiliza la siguiente consulta
+-- Nos traemos todas las orientaciones diferentes de la tabla Maestra donde su valor
+-- no sea null y los insertamos en la tabla orientacion
 INSERT
 	INTO
 	[DropTable].[Orientacion] (nombre)
@@ -362,6 +378,10 @@ from
 where
 	INMUEBLE_ORIENTACION is not null
 
+-- Para insertar los datos en la tabla moneda se utiliza la siguiente consulta
+-- Nos traemos todas las monedas diferentes de la tabla Maestra donde su valor
+-- no sea null, al tener dos columnas donde existe un posible valor de la moneda
+-- hacemos un union de las mismas y los insertamos en la tabla moneda
 INSERT
 	INTO
 	[DropTable].[Moneda] (nombre)
@@ -391,31 +411,33 @@ UNION ALL
 		PAGO_VENTA_MONEDA IS NOT NULL
 ) AS Monedas;
 
-
+-- Para insertar los datos en la tabla provincia se utiliza la siguiente consulta
+-- Nos traemos todas las provincias diferentes de la tabla Maestra donde su valor
+-- no sea null, al tener dos columnas donde existe un posible valor de la provincia
+-- hacemos un union de las mismas y los insertamos en la tabla provincia	
 INSERT
 	INTO
 	[DropTable].[Provincia] (nombre) (
 	select
 		DISTINCT(INMUEBLE_PROVINCIA)
-		--localidad.id_localidad
 	from
 		gd_esquema.Maestra maestra
-	-- inner join [DropTable].[Localidad] localidad on
-	--	maestra.INMUEBLE_LOCALIDAD = localidad.nombre
 	where
 		INMUEBLE_PROVINCIA is not null
 union
 	select
 		DISTINCT(SUCURSAL_PROVINCIA)
-		--localidad.id_localidad
 	from
 		gd_esquema.Maestra maestra
-	--inner join [DropTable].[Localidad] localidad on
-	--	maestra.INMUEBLE_LOCALIDAD = localidad.nombre
 	where
 		SUCURSAL_PROVINCIA is not null)
-		
-		
+
+-- Para insertar los datos en la tabla localidad se utiliza la siguiente consulta
+-- Nos traemos todas las localidades diferentes de la tabla Maestra donde su valor
+-- no sea null, al tener dos columnas donde existe un posible valor de la localidad
+-- hacemos un union de las mismas, ademas tenemos que hacer un inner join para poder
+-- obtener el id de la provincia con la que matchea la localidad
+--  y los insertamos en la tabla localidad		
 		INSERT
 	INTO
 	[DropTable].[Localidad] (nombre,
@@ -446,6 +468,12 @@ UNION ALL
 		SUCURSAL_LOCALIDAD IS NOT NULL
 ) AS Localidades;
 
+
+-- Para insertar los datos en la tabla barrio se utiliza la siguiente consulta
+-- Nos traemos todos los barrios diferentes de la tabla Maestra donde su valor
+-- no sea null, al tener dos columnas donde existe un posible valor del barrio
+-- hacemos un union de las mismas, ademas tenemos que hacer un inner join para poder
+-- obtener el id de la localidad con la que matchea el barrio
 INSERT
 	INTO
 	[DropTable].[Barrio] (nombre, id_localidad)
@@ -465,8 +493,10 @@ FROM
 		INMUEBLE_BARRIO IS NOT NULL
 ) AS Barrios;
 
-
-
+-- Para insertar los datos en la tabla sucursal se utiliza la siguiente consulta
+-- Nos traemos todas las sucursales diferentes de la tabla Maestra donde su valor
+-- de codigo no sea null, ademas tenemos que hacer un inner join para poder
+-- insertar las sucursales segun su provincia y localidad
 INSERT
 	INTO
 	[DropTable].[Sucursal] (codigo,
@@ -479,20 +509,18 @@ select
 	SUCURSAL_DIRECCION,
 	SUCURSAL_NOMBRE,
 	SUCURSAL_TELEFONO
-	--barrio.id_barrio
 from
 	gd_esquema.Maestra maestra
 inner join [DropTable].[Provincia] provincia on
 	maestra.SUCURSAL_PROVINCIA = provincia.nombre
 inner join [DropTable].[Localidad] localidad on
 	maestra.SUCURSAL_LOCALIDAD = localidad.nombre
---inner join [DropTable].[Barrio] barrio on
-	--barrio.id_localidad = localidad.id_localidad 
 where
 	SUCURSAL_CODIGO is not null
 	
-
-
+-- Para insertar los datos en la tabla disposicion se utiliza la siguiente consulta
+-- Nos traemos todas las disposiciones diferentes de la tabla Maestra donde su valor
+-- no sea null y los insertamos en la tabla disposicion
 INSERT
 	INTO
 	[DropTable].[Disposicion] (nombre)
@@ -503,7 +531,11 @@ from
 where
 	INMUEBLE_DISPOSICION is not null
 
-
+-- Para insertar los datos en la tabla persona se utiliza la siguiente consulta
+-- Nos traemos todas las personas diferentes de la tabla Maestra donde su valor
+-- de dni no sea null, ademas tenemos que hacer un inner join con las columnas
+-- propietario, agente, comprador e inquilino para poder obtener todas las personas
+-- y poder insertarlas
 INSERT
 	INTO
 	[DropTable].[Persona] (dni,
@@ -577,7 +609,11 @@ UNION
 
 
 
-
+-- Para insertar los datos en la tabla inmueble se utiliza la siguiente consulta
+-- Nos traemos todos los inmuebles diferentes de la tabla Maestra donde su valor
+-- de codigo no sea null, ademas tenemos que hacer un inner join con las columnas
+-- tipo_inmueble, disposicion, orientacion, barrio, localidad, provincia e inmueble_estado
+-- para poder obtener todos los inmuebles y poder insertarlos
 
 INSERT INTO [DropTable].[Inmueble] (codigo, nombre, descripcion, direccion, superficie, antiguedad, expensas, ambientes, id_inmueble_estado, id_tipo_inmueble, id_disposicion, id_orientacion, id_barrio)
 SELECT DISTINCT 
@@ -601,8 +637,9 @@ INNER JOIN [DropTable].[Localidad]  l ON l.nombre  = INMUEBLE_LOCALIDAD and b.id
 INNER JOIN [DropTable].[Provincia] p ON p.nombre  = INMUEBLE_PROVINCIA and p.id_provincia  = l.id_provincia  
 
 
-
-
+-- Para insertar los datos en la tabla caracteristicas se utiliza la siguiente consulta
+-- insertamos las caracteristicas que aparacen en la tabla Maestra
+-- y las insertamos en la tabla caracteristicas
 INSERT INTO [DropTable].[Caracteristicas] (caracteristica) VALUES
 ('Wifi'),
 ('Cable'),
@@ -610,7 +647,11 @@ INSERT INTO [DropTable].[Caracteristicas] (caracteristica) VALUES
 ('Gas')
 
 
-
+-- Para insertar los datos en la tabla caracteristicas_por_inmueble se utiliza la siguiente consulta
+-- Nos traemos todos los inmuebles que tienen caracteristicas diferentes de la tabla Maestra donde su valor
+-- no sea null, ademas tenemos que hacer un inner join con las columnas
+-- inmueble, y un left join para caracteristicas para  que traiga solo las que tenga la tabla inmueble
+-- y poder obtener todos los inmuebles y caracteristicas que tengan
 INSERT INTO [DropTable].[Caracteristicas_por_inmueble] (id_inmueble, id_caracteristicas)
 SELECT inmueble.id_inmueble, c.id_caracteristicas
 FROM gd_esquema.Maestra m
@@ -624,6 +665,10 @@ WHERE
     m.INMUEBLE_CODIGO IS NOT NULL
     AND (m.INMUEBLE_CARACTERISTICA_WIFI = 1 OR m.INMUEBLE_CARACTERISTICA_CABLE = 1 OR m.INMUEBLE_CARACTERISTICA_CALEFACCION = 1 OR m.INMUEBLE_CARACTERISTICA_GAS = 1)
 
+
+-- Para insertar los datos en la tabla Alquiler_estado se utiliza la siguiente consulta
+-- Nos traemos todas los estados de alquiler diferentes de la tabla Maestra donde su valor
+-- no sea null y los insertamos en la tabla Alquiler_estado
 INSERT
 	INTO
 	[DropTable].[Alquiler_Estado] (nombre)
@@ -633,7 +678,10 @@ from
 	gd_esquema.Maestra
 where
 	ALQUILER_ESTADO is not null
-	
+
+-- Para insertar los datos en la tabla Estado_anuncio se utiliza la siguiente consulta
+-- Nos traemos todas los estados de anuncios diferentes de la tabla Maestra donde su valor
+-- no sea null y los insertamos en la tabla Estado_anuncio
 	INSERT
 	INTO
 	[DropTable].[Estado_anuncio] (nombre)
@@ -643,7 +691,10 @@ from
 	gd_esquema.Maestra
 where
 	 ANUNCIO_ESTADO is not null
-	 
+
+-- Para insertar los datos en la tabla Agente se utiliza la siguiente consulta
+-- Nos traemos todas las personas con un inner join matcheando el dni y tambien 
+-- otro inner join con sucural matcheando codigo de sucursal y los insertamos en la tabla Agente
 	 INSERT INTO [DropTable].[Agente] (id_persona , id_sucursal)
 SELECT DISTINCT p.id_persona , S.id_sucursal
 FROM gd_esquema.Maestra m 
@@ -659,7 +710,11 @@ INNER JOIN [DropTable].[Inmueble] i ON i.codigo  = m.INMUEBLE_CODIGO
 WHERE m.PROPIETARIO_DNI IS NOT NULL and m.INMUEBLE_CODIGO IS NOT NULL
 
 
-
+-- Para insertar los datos en la tabla Anuncio se utiliza la siguiente consulta
+-- Nos traemos todos los anuncios diferentes de la tabla Maestra donde su valor
+-- de codigo no sea null, ademas tenemos que hacer un inner join con las columnas
+-- agente, inmueble, moneda, tipo_operacion y estado_anuncio
+-- para poder obtener todos los anuncios y poder insertarlos
 INSERT INTO [DropTable].[Anuncio] (
 codigo,
 fecha_publicacion,
@@ -688,7 +743,10 @@ and m.ANUNCIO_TIPO_OPERACION  IS NOT NULL
 and  m.ANUNCIO_ESTADO  IS NOT NULL
 
 
-
+-- Para insertar los datos en la tabla Alquiler se utiliza la siguiente consulta
+-- Nos traemos todos los alquileres diferentes de la tabla Maestra donde su valor
+-- de codigo no sea null, ademas tenemos que hacer un inner join con las columnas
+-- anuncio y alquiler_estado para poder obtener todos los alquileres y poder insertarlos
 INSERT INTO [DropTable].[Alquiler] (
 fecha_inicio,
 fecha_fin,
@@ -706,6 +764,9 @@ INNER JOIN [DropTable].[Anuncio] a ON a.codigo  = m.ANUNCIO_CODIGO
 INNER JOIN [DropTable].[Alquiler_Estado] ea ON ea.nombre  = m.ALQUILER_ESTADO 
 WHERE m.ANUNCIO_CODIGO IS NOT NULL and m.ALQUILER_ESTADO IS NOT NULL
 
+-- Para insertar los datos en la tabla Inquilino se utiliza la siguiente consulta
+-- Nos traemos todas las personas con un inner join matcheando el dni y tambien
+-- otro inner join con alquiler matcheando codigo de alquiler y los insertamos en la tabla Inquilino
 INSERT INTO [DropTable].[Inquilino] (id_persona , id_alquiler)
 SELECT DISTINCT p.id_persona , a.id_alquiler
 FROM gd_esquema.Maestra m 
@@ -714,7 +775,11 @@ INNER JOIN [DropTable].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO
 WHERE m.ALQUILER_CODIGO IS NOT NULL and m.INQUILINO_DNI IS NOT NULL
 
 
-
+-- Para insertar los datos en la tabla Pago_Alquiler se utiliza la siguiente consulta
+-- Nos traemos todos los pagos de alquiler diferentes de la tabla Maestra donde el codigo de alquiler
+-- el medio de pago y el codigo de pago no sean null, 
+-- ademas tenemos que hacer un inner join con las columnas
+-- alquiler, medio_pago para poder obtener todos los pagos de alquiler y poder insertarlos
 INSERT INTO [DropTable].[Pago_Alquiler] (
 codigo,
 descripcion,
@@ -733,6 +798,11 @@ INNER JOIN [DropTable].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO
 INNER JOIN [DropTable].[Medio_Pago] mp ON mp.nombre  = m.PAGO_ALQUILER_MEDIO_PAGO  
 WHERE m.ALQUILER_CODIGO IS NOT NULL and m.PAGO_ALQUILER_MEDIO_PAGO IS NOT NULL and  m.PAGO_ALQUILER_CODIGO IS NOT NULL
 
+
+-- Para insertar los datos en la tabla Detalle_Importe_Alquiler se utiliza la siguiente consulta
+-- Nos traemos todos los detalles de importe de alquiler diferentes de la tabla Maestra donde el codigo de alquiler
+-- y el precio de alquiler no sean null , ademas tenemos que hacer un inner join con las columnas
+-- alquiler para poder obtener todos los detalles de importe de alquiler y poder insertarlos
 INSERT INTO [DropTable].[Detalle_Importe_Alquiler] (
 importe,
 numero_inicio_periodo,
@@ -745,7 +815,9 @@ FROM gd_esquema.Maestra m
 INNER JOIN [DropTable].[Alquiler] a ON a.codigo  = m.ALQUILER_CODIGO   
 WHERE m.ALQUILER_CODIGO IS NOT NULL and m.DETALLE_ALQ_PRECIO is not null
 
-
+-- Para insertar los datos en la tabla Venta se utiliza la siguiente consulta
+-- Nos traemos todas las ventas diferentes de la tabla Maestra donde el codigo de anuncio
+-- y el codigo de venta no sean null , ademas tenemos que hacer un inner join con las columnas
 INSERT INTO [DropTable].[Venta] (
 fecha_venta,
 precio_venta,
@@ -762,6 +834,9 @@ INNER JOIN [DropTable].[Anuncio] a ON a.codigo  = m.ANUNCIO_CODIGO
 INNER JOIN [DropTable].[Moneda] mo ON mo.nombre  = m.VENTA_MONEDA  
 WHERE m.ANUNCIO_CODIGO IS NOT NULL and m.VENTA_CODIGO IS NOT NULL
 
+-- Para insertar los datos en la tabla Comprador se utiliza la siguiente consulta
+-- Nos traemos todas las personas con un inner join matcheando el dni y tambien
+-- otro inner join con venta matcheando codigo de venta y los insertamos en la tabla Comprador
 
 INSERT INTO [DropTable].[Comprador] (id_persona , id_venta)
 SELECT DISTINCT p.id_persona , v.id_venta
@@ -770,6 +845,11 @@ INNER JOIN [DropTable].[Persona] p ON p.dni = m.COMPRADOR_DNI
 INNER JOIN [DropTable].[Venta] v ON v.codigo  = m.VENTA_CODIGO
 WHERE m.VENTA_CODIGO IS NOT NULL and m.COMPRADOR_DNI IS NOT NULL
 
+
+-- Para insertar los datos en la tabla Pago_Venta se utiliza la siguiente consulta
+-- Nos traemos todos los pagos de venta diferentes de la tabla Maestra donde el codigo de venta
+-- y el medio de pago no sean null , ademas tenemos que hacer un inner join con las columnas
+-- venta, medio_pago y moneda para poder obtener todos los pagos de venta y poder insertarlos
 INSERT INTO [DropTable].[Pago_Venta] (
 importe,
 cotizacion,
