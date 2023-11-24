@@ -31,7 +31,7 @@ SET
 ANSI_NULLS ON
 SET
 QUOTED_IDENTIFIER ON
-
+-- Dimensiones. Faltan ubicacion y ambiente
 CREATE TABLE [DropTable].[BI_Sucursal](
 [id_sucursal] [int] IDENTITY(1,
 1) PRIMARY KEY,
