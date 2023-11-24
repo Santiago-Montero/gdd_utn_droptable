@@ -31,7 +31,7 @@ SET
 ANSI_NULLS ON
 SET
 QUOTED_IDENTIFIER ON
--- Dimensiones. Faltan ubicacion y ambiente
+
 CREATE TABLE [DropTable].[BI_Sucursal](
 [id_sucursal] [int] IDENTITY(1,
 1) PRIMARY KEY,
@@ -52,7 +52,7 @@ CREATE TABLE [DropTable].[BI_Rango_m2](
 [rango_m2] [int] IDENTITY(1,
 1) PRIMARY KEY,
 [metros_minimos] [int] NOT NULL,
-[metos_maximos] [int] NOT NULL,
+[metros_maximos] [int] NOT NULL,
 )
 
 
@@ -96,3 +96,14 @@ create table [DropTable].[BI_Ubicacion](
 
 
 
+INSERT INTO DROP_TABLE.BI_Rango_etario([edad_minima], [edad_maxima]) values (0,25)
+INSERT INTO DROP_TABLE.BI_Rango_etario([edad_minima], [edad_maxima]) values (26,35)
+INSERT INTO DROP_TABLE.BI_Rango_etario([edad_minima], [edad_maxima]) values (36,50)
+INSERT INTO DROP_TABLE.BI_Rango_etario([edad_minima], [edad_maxima]) values (51,null)
+
+
+INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (0,35)
+INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (36,55)
+INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (56,75)
+INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (76,100)
+INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (101,null)
