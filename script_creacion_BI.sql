@@ -1,5 +1,5 @@
 USE GD2C2023;
-DECLARE @SchemaName NVARCHAR(128) = 'DropTable_BI';
+DECLARE @SchemaName NVARCHAR(128) = 'DropTable';
 DECLARE @SQL NVARCHAR(MAX);
 
 IF NOT EXISTS (
@@ -81,6 +81,10 @@ CREATE TABLE [DropTable].[BI_Tiempo](
 [cuatrimestre] date not null,
 [mes] date not null
 
+)
+CREATE TABLE [DropTable].[BI_Ambiente](
+[id_ambiente] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+[cantidad] [varchar](100) NOT NULL,
 )
 
 
