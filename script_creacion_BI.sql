@@ -87,5 +87,12 @@ CREATE TABLE [DropTable].[BI_Ambiente](
 [cantidad] [varchar](100) NOT NULL,
 )
 
+create table [DropTable].[BI_Ubicacion](
+    [id_Ubicacion] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+    [provincia] varchar(255) not null,
+    [localidad] varchar(255) not null,
+    [barrio] varchar(255) not null
+)
+
 
 
