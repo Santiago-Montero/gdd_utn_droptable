@@ -36,9 +36,7 @@ CREATE TABLE [DropTable].[BI_Sucursal](
 [id_sucursal] [int] IDENTITY(1,
 1) PRIMARY KEY,
 [nombre] VARCHAR(100) NOT NULL,
-[codigo] VARCHAR(100) NOT NULL,
-[telefono] int,
-[direccion] VARCHAR(100) NOT NULL
+[codigo] VARCHAR(100) NOT NULL
 )
 
 CREATE TABLE [DropTable].[BI_Rango_etario](
@@ -93,20 +91,24 @@ create table [DropTable].[BI_Ubicacion](
     [localidad] varchar(255) not null,
     [barrio] varchar(255) not null
 )
+CREATE TABLE BI_Ambiente (
+    id_ambientes INT PRIMARY KEY,
+    cantidad VARCHAR(100)
+);
 
 
 
-INSERT INTO DROP_TABLE.BI_Rango_etario([edad_minima], [edad_maxima]) values (0,25)
-INSERT INTO DROP_TABLE.BI_Rango_etario([edad_minima], [edad_maxima]) values (26,35)
-INSERT INTO DROP_TABLE.BI_Rango_etario([edad_minima], [edad_maxima]) values (36,50)
-INSERT INTO DROP_TABLE.BI_Rango_etario([edad_minima], [edad_maxima]) values (51,null)
+INSERT INTO DropTable.BI_Rango_etario([edad_minima], [edad_maxima]) values (0,25)
+INSERT INTO DropTable.BI_Rango_etario([edad_minima], [edad_maxima]) values (26,35)
+INSERT INTO DropTable.BI_Rango_etario([edad_minima], [edad_maxima]) values (36,50)
+INSERT INTO DropTable.BI_Rango_etario([edad_minima], [edad_maxima]) values (51,null)
 
 
-INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (0,35)
-INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (36,55)
-INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (56,75)
-INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (76,100)
-INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (101,null)
+INSERT INTO DropTable.BI_Rango_m2([metros_minimos], [metros_maximos]) values (0,35)
+INSERT INTO DropTable.BI_Rango_m2([metros_minimos], [metros_maximos]) values (36,55)
+INSERT INTO DropTable.BI_Rango_m2([metros_minimos], [metros_maximos]) values (56,75)
+INSERT INTO DropTable.BI_Rango_m2([metros_minimos], [metros_maximos]) values (76,100)
+INSERT INTO DropTable.BI_Rango_m2([metros_minimos], [metros_maximos]) values (101,null)
 
 INSERT
 	INTO
@@ -135,11 +137,56 @@ where
 INSERT INTO DropTable.BI_Ambiente (cantidad)
 SELECT DISTINCT i.ambientes FROM DropTable.Inmueble i
 
-INSERT INTO DropTable.BI_Sucursal(id_sucursal,nombre,codigo,telefono,direccion)
-SELECT S.id_sucursal ,S.nombre, S.codigo, S.telefono, S.direccion
-FROM DropTable.Sucursal S
 
 INSERT INTO DropTable.BI_Ubicacion (provincia, localidad, barrio)
 SELECT p.nombre, l.nombre, b.nombre  FROM DropTable.Barrio b
 INNER JOIN DropTable.Localidad l ON l.id_localidad  = b.id_localidad  
 INNER JOIN DropTable.Provincia p ON p.id_provincia  = l.id_provincia  
+
+
+
+insert into DropTable.BI_Sucursal (nombre,codigo)
+SELECT s.nombre,s.codigo FROM DropTable.Sucursal s
+
+
+CREATE TABLE [DropTable].[Hecho_Anuncio](
+    [id_anuncio] [int] IDENTITY(1,1) PRIMARY KEY,
+    [id_ambiente] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Ambiente]([id_ambiente]),
+    [id_tipo_operacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_Operacion]([id_tipo_operacion]),
+    [id_tipo_inmueble] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_inmueble]([id_tipo_inmueble]),
+    [id_rango_m2] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_m2]([rango_m2]),
+    [id_moneda] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Moneda]([id_moneda]),
+    [id_sucursal] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Sucursal]([id_sucursal]),
+    [id_rango_etario] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_etario]([rango_id]),
+    [fecha_publicacion] [date] NOT NULL,
+    [fecha_finalizacion] [date],
+    [precio_anuncio] [int] NOT NULL,
+    [id_ubicacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Ubicacion]([id_Ubicacion])
+);
+CREATE TABLE [DropTable].[Hecho_Venta](
+    [id_venta] [int] IDENTITY(1,1) PRIMARY KEY,
+    [id_ambiente] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Ambiente]([id_ambiente]),
+    [id_tipo_operacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_Operacion]([id_tipo_operacion]),
+    [id_tipo_inmueble] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_inmueble]([id_tipo_inmueble]),
+    [id_rango_m2] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_m2]([rango_m2]),
+    [id_moneda] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Moneda]([id_moneda]),
+    [id_sucursal] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Sucursal]([id_sucursal]),
+    [id_rango_etario] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_etario]([rango_id]),
+    [fecha_venta] [date] NOT NULL,
+    [precio] [int] NOT NULL,
+    [comision_inmobiliaria] [int] NOT NULL
+);
+
+
+CREATE TABLE [DropTable].[Hecho_Alquiler](
+    [id_alquiler] [int] IDENTITY(1,1) PRIMARY KEY,
+    [id_tipo_operacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_Operacion]([id_tipo_operacion]),
+    [id_tipo_inmueble] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_inmueble]([id_tipo_inmueble]),
+    [id_rango_m2] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_m2]([rango_m2]),
+    [id_moneda] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Moneda]([id_moneda]),
+    [deposito] [int] NOT NULL,
+    [id_rango_etario] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_etario]([rango_id]),
+    [fecha_inicio] [date] NOT NULL,
+    [fecha_fin] [date] NOT NULL,
+    [comision] [int] NOT NULL
+);
