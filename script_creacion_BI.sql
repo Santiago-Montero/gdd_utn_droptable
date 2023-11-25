@@ -149,7 +149,7 @@ insert into DropTable.BI_Sucursal (nombre,codigo)
 SELECT s.nombre,s.codigo FROM DropTable.Sucursal s
 
 
-CREATE TABLE [DropTable].[Hecho_Anuncio]( 
+CREATE TABLE [DropTable].[BI_Hecho_Anuncio]( 
     [id_ambiente] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Ambiente]([id_ambiente]),
     [id_tipo_operacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_Operacion]([id_tipo_operacion]),
     [id_tipo_inmueble] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_inmueble]([id_tipo_inmueble]),
@@ -162,7 +162,7 @@ CREATE TABLE [DropTable].[Hecho_Anuncio](
     [precio_anuncio] [int] NOT NULL,
     [id_ubicacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Ubicacion]([id_Ubicacion])
 );
-CREATE TABLE [DropTable].[Hecho_Venta](    
+CREATE TABLE [DropTable].[BI_Hecho_Venta](    
     [id_ambiente] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Ambiente]([id_ambiente]),
     [id_tipo_operacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_Operacion]([id_tipo_operacion]),
     [id_tipo_inmueble] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_inmueble]([id_tipo_inmueble]),
@@ -176,7 +176,7 @@ CREATE TABLE [DropTable].[Hecho_Venta](
 );
 
 
-CREATE TABLE [DropTable].[Hecho_Alquiler](
+CREATE TABLE [DropTable].[BI_Hecho_Alquiler](
     [id_tipo_operacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_Operacion]([id_tipo_operacion]),
     [id_tipo_inmueble] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tipo_inmueble]([id_tipo_inmueble]),
     [id_rango_m2] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_m2]([rango_m2]),
