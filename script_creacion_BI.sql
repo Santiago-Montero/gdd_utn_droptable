@@ -120,13 +120,26 @@ where
 
 
  Insert
-    into [DropTable].[BI_Tipo_Operacion] (nombre)
-    select distinct (nombre)
-    from [DropTable].[Tipo_Operacion]  
-    where nombre is not null
+	into [DropTable].[BI_Tipo_Operacion] (nombre)
+	select distinct (nombre)
+	from [DropTable].[Tipo_Operacion]  
+	where nombre is not null
 
 
-    Insert into [DropTable].[BI_Tipo_Inmueble] (nombre)
-    select distinct (nombre)
-    from [DropTable].[Tipo_Inmueble]
-    where nombre is not null
+	Insert into [DropTable].[BI_Tipo_Inmueble] (nombre)
+	select distinct (nombre)
+	from [DropTable].[Tipo_Inmueble]
+	where nombre is not null
+
+
+INSERT INTO DropTable.BI_Ambiente (cantidad)
+SELECT DISTINCT i.ambientes FROM DropTable.Inmueble i
+
+INSERT INTO DropTable.BI_Sucursal(id_sucursal,nombre,codigo,telefono,direccion)
+SELECT S.id_sucursal ,S.nombre, S.codigo, S.telefono, S.direccion
+FROM DropTable.Sucursal S
+
+INSERT INTO DropTable.BI_Ubicacion (provincia, localidad, barrio)
+SELECT p.nombre, l.nombre, b.nombre  FROM DropTable.Barrio b
+INNER JOIN DropTable.Localidad l ON l.id_localidad  = b.id_localidad  
+INNER JOIN DropTable.Provincia p ON p.id_provincia  = l.id_provincia  
