@@ -199,7 +199,7 @@ END;
 
 
 
- INSERT INTO [DROP_TABLE].[Hecho_Anuncio] (
+ INSERT INTO [DROP_TABLE].[BI_Hecho_Anuncio] (
     [id_ambiente],
     [id_tipo_operacion],
     [id_tipo_inmueble],
@@ -230,4 +230,36 @@ INNER JOIN [DROP_TABLE].[Moneda] mo ON mo.id_moneda = a.id_moneda
 INNER JOIN [DROP_TABLE].[BI_Moneda] biMo ON mo.nombre  = biMo.nombre 
 INNER JOIN [DROP_TABLE].[BI_Rango_etario] biRE ON [DROP_TABLE].CalculoEdad(pe.fecha_nacimiento) BETWEEN biRE.edad_minima  AND biRE.edad_maxima 
 GROUP BY bia.id_ambiente, biTI.id_tipo_inmueble,  biS.id_sucursal,biTope.id_tipo_operacion,  bim2.rango_m2 , biu.id_Ubicacion, a.fecha_publicacion, a.fecha_Finalizacion, biMo.id_moneda ,a.precio_anuncio , biRE.rango_id 
+
+insert into [DropTable].[BI_Hecho_venta](
+    [id_ambiente],
+    [id_tipo_operacion],
+    [id_tipo_inmueble],
+    [id_rango_m2],
+    [id_moneda],
+    [id_sucursal],
+    [id_rango_etario] ,
+    [fecha_venta] ,
+    [precio] ,
+    [comision_inmobiliaria]
+
+) Select   bia.id_ambiente, biTope.id_Tipo_Operacion ,biTI.id_tipo_inmueble, bim2.rango_m2, bm.id_moneda, biS.id_sucursal , ,v.fecha_venta,v.precio_venta,v.comision_inmobiliaria    from [DropTable].[Venta] v 
+inner join [DropTable].[moneda] m on v.id_moneda = m.id_moneda
+inner join [DropTable].[BI_Moneda] bm on m.nombre = bm.nombre --tengo modeda
+inner join [DropTable].[Anuncio] a on v.id_anuncio = a.id_anuncio 
+INNER JOIN [DROP_TABLE].[Tipo_Operacion] tope ON tope.id_tipo_operacion = a.id_tipo_operacion 
+INNER JOIN [DROP_TABLE].[BI_Tipo_Operacion] biTope ON biTope.nombre = tope.nombre --tengo tipo operacion
+INNER JOIN [DROP_TABLE].[Inmueble] i ON i.id_inmueble = a.id_inmueble --Me traigo inmueble para ir a buscar tipo inmueble despues
+INNER JOIN [DROP_TABLE].[Tipo_inmueble] ti ON ti.id_tipo_inmueble  = i.id_tipo_inmueble 
+INNER JOIN [DROP_TABLE].[BI_Tipo_inmueble] biTI ON biTI.nombre = ti.nombre --tengo tipo inmueble
+INNER JOIN [DROP_TABLE].[BI_Rango_m2] bim2 ON  i.superficie BETWEEN  bim2.metros_minimos AND bim2.metros_maximos  --tengo m2
+INNER JOIN [DROP_TABLE].[BI_Ambiente] biA ON biA.cantidad = i.ambientes --tengo ambientes
+INNER JOIN [DROP_TABLE].[Agente] ag ON ag.id_agente = a.id_agente -- voy a buscar agente para sucursal
+INNER JOIN [DROP_TABLE].[Sucursal] s ON s.id_sucursal = ag.id_sucursal 
+INNER JOIN [DROP_TABLE].[BI_Sucursal] biS ON biS.nombre = s.nombre
+
+---FAlta Agregar al select RANGO ETARIO
+
+
+
 
