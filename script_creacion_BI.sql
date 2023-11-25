@@ -107,3 +107,26 @@ INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (3
 INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (56,75)
 INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (76,100)
 INSERT INTO DROP_TABLE.BI_Rango_m2([metros_minimos], [metros_maximos]) values (101,null)
+
+INSERT
+	INTO
+	[DropTable].[BI_Moneda] (nombre)
+select
+	DISTINCT(nombre)
+from
+	[DropTable].[moneda] 
+where
+	nombre is not null
+
+
+ Insert
+    into [DropTable].[BI_Tipo_Operacion] (nombre)
+    select distinct (nombre)
+    from [DropTable].[Tipo_Operacion]  
+    where nombre is not null
+
+
+    Insert into [DropTable].[BI_Tipo_Inmueble] (nombre)
+    select distinct (nombre)
+    from [DropTable].[Tipo_Inmueble]
+    where nombre is not null
