@@ -394,3 +394,47 @@ SELECT * FROM DropTable.vista1
 
 
 
+CREATE VIEW DropTable.vista2 AS
+SELECT
+    c.anio,
+    c.cuatrimestre,
+    ISNULL(AVG(a.precio),0) AS [Promedio precio anuncios],
+     a.moneda as [Moneda],
+    a.Tipo_Operacion as [ Tipo Operacion],
+    a.Tipo_Inmueble as [ Tipo Inmueble],
+    a.Rango_m2 as [ Rango m2]
+    
+FROM
+    DropTable.BI_Tiempo c
+LEFT JOIN
+    (
+        SELECT
+        	biA.precio_anuncio as precio,
+        	bm.nombre as moneda,
+         	biTi.nombre as Tipo_Inmueble,
+        	bt.cuatrimestre as cuatrimestre,
+        	bt2.cuatrimestre as cuatrimestre2,
+        	biTo.nombre as Tipo_Operacion,
+        	CONCAT(m2.metros_minimos, ' ', m2.metros_maximos) as Rango_m2
+        FROM
+            [DropTable].[BI_Hecho_Anuncio] biA  
+            INNER join [DropTable].[BI_Moneda] bm ON biA.id_moneda  = bm.id_moneda  
+            INNER JOIN [DropTable].[BI_Tiempo] bt ON bt.id_tiempo = biA.id_tiempo_publicacion
+            INNER JOIN [DropTable].[BI_Tiempo] bt2 ON bt2.id_tiempo = biA.id_tiempo_finalizacion
+            INNER JOIN [DropTable].[BI_Ambiente] biAm on biAm.id_ambiente  = biA.id_ambiente  
+            INNER JOIN [DropTable].[BI_Ubicacion] biU on biU.id_Ubicacion = biA.id_ubicacion 
+            INNER JOIN [DropTable].[BI_Tipo_Operacion] biTo on biTo.id_tipo_operacion = biA.id_tipo_operacion
+            INNER JOIN [DropTable].[BI_Tipo_Inmueble] biTi on biTi.id_tipo_inmueble = biA.id_tipo_inmueble
+            INNER JOIN [DropTable].[BI_Rango_m2] m2 on m2.id_rango_m2 = biA.id_rango_m2
+            ) a ON c.cuatrimestre = a.cuatrimestre2 AND c.cuatrimestre = a.cuatrimestre
+GROUP BY
+    c.anio,
+    c.cuatrimestre,
+    a.Tipo_Operacion,
+    a.Tipo_Inmueble,
+    a.precio,
+    a.Rango_m2,
+    a.moneda
+
+
+SELECT * FROM DropTable.vista2
