@@ -131,6 +131,7 @@ CREATE TABLE [DropTable].[BI_Hecho_Alquiler](
     [id_rango_m2] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_m2]([id_rango_m2]),
     [id_moneda] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Moneda]([id_moneda]),
     [deposito] [int],
+    [importe] [int],
     [id_rango_etario] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_etario]([id_rango_etario]),
 	[id_sucursal] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Sucursal]([id_sucursal]),
     [id_tiempo_inicio] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tiempo]([id_tiempo]),
@@ -340,9 +341,10 @@ id_tiempo_fin,
 id_tiempo_pago_alquiler,
 id_tiempo_inicio_periodo,
 id_tiempo_fin_periodo,
-id_ubicacion
+id_ubicacion,
+importe
 )
-SELECT a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario, biS.id_sucursal  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo, biU.id_Ubicacion  
+SELECT a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario, biS.id_sucursal  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo, biU.id_Ubicacion  ,a2.precio_anuncio
 FROM [DropTable].[Alquiler] a
 INNER JOIN [DropTable].[Anuncio] a2 ON a2.id_anuncio = a.id_anuncio 
 INNER JOIN [DropTable].[Inmueble] i ON i.id_inmueble = a2.id_inmueble
