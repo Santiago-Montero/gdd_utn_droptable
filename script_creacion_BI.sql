@@ -451,3 +451,89 @@ GROUP BY
 
 
 SELECT * FROM DropTable.vista2
+
+
+
+
+--4--
+CREATE VIEW DropTable.vista4 AS
+SELECT
+ --   T.nombre AS TipoInmueble,
+ 	TP.anio,
+	TP.mes,
+    COUNT(*) AS TotalPagos,
+    SUM(CASE WHEN A.id_tiempo_fin_periodo <= A.id_tiempo_pago_alquiler THEN 1 ELSE 0 END) AS PagosEnTermino,
+    SUM(CASE WHEN A.id_tiempo_fin_periodo > A.id_tiempo_pago_alquiler THEN 1 ELSE 0 END) AS PagosAtrasados,
+    CAST(SUM(CASE WHEN A.id_tiempo_fin_periodo > A.id_tiempo_pago_alquiler THEN 1 ELSE 0 END) AS DECIMAL) / COUNT(*) * 100 AS PorcentajeIncumplimiento
+FROM
+    [DropTable].[BI_Hecho_Alquiler] A
+JOIN
+    [DropTable].[BI_Tipo_inmueble] T ON A.id_tipo_inmueble = T.id_tipo_inmueble
+JOIN 
+    [DropTable].[BI_Tiempo] TP ON TP.id_tiempo = A.id_tiempo_fin_periodo 
+GROUP BY
+  --  T.nombre,
+    A.id_tiempo_fin_periodo,TP.mes,
+	TP.anio;
+
+SELECT * FROM DropTable.vista4
+
+--6--
+CREATE VIEW DropTable.vista6 as
+SELECT
+    T.nombre AS TipoInmueble,
+	TI.anio,
+	TI.cuatrimestre,
+	TI.mes,
+    U.localidad,
+    AVG(H.precio / (R.metros_maximos - R.metros_minimos)) AS PrecioPromedioM2
+FROM
+    [DropTable].[BI_Hecho_Venta] H
+JOIN
+    [DropTable].[BI_Tipo_inmueble] T ON H.id_tipo_inmueble = T.id_tipo_inmueble
+JOIN
+    [DropTable].[BI_Ubicacion] U ON H.id_ubicacion = U.id_Ubicacion
+JOIN
+    [DropTable].[BI_Rango_m2] R ON H.id_rango_m2 = R.id_rango_m2
+JOIN
+    [DropTable].[BI_Tiempo] TI ON TI.id_tiempo = H.id_tiempo_venta
+GROUP BY
+    T.nombre,
+    U.localidad,
+	TI.anio,
+	TI.cuatrimestre,
+	TI.mes;
+
+SELECT * FROM DropTable.vista6
+
+
+--7--
+CREATE VIEW DropTable.vista7 as
+SELECT
+    biTo.nombre AS TipoOperacion,
+    biS.nombre AS Sucursal,
+    biTI.anio AS Anio,
+    biTI.cuatrimestre AS Cuatrimestre,
+    ISNULL(AVG(
+        CASE
+            WHEN ha.id_tipo_operacion = 1 THEN hv.comision_inmobiliaria -- Venta
+            WHEN ha.id_tipo_operacion = 2 THEN ha.comision -- Alquiler
+            ELSE 0
+        END
+    ),0) AS ValorPromedioComision
+FROM
+    [DropTable].[BI_Hecho_Alquiler] ha
+LEFT JOIN
+    [DropTable].[BI_Hecho_Venta] hv ON ha.id_tipo_operacion = hv.id_tipo_operacion
+                                      AND ha.id_tiempo_inicio = hv.id_tiempo_venta
+INNER JOIN
+    [DropTable].[BI_Tipo_Operacion] biTo ON ha.id_tipo_operacion = biTo.id_tipo_operacion
+INNER JOIN
+    [DropTable].[BI_Sucursal] biS ON ha.id_sucursal = biS.id_sucursal
+INNER JOIN
+    [DropTable].[BI_Tiempo] biTI ON ha.id_tiempo_inicio = biTI.id_tiempo
+GROUP BY
+    biTo.nombre,
+    biS.nombre,
+    biTI.anio,
+    biTI.cuatrimestre
