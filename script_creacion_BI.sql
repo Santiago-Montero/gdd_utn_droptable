@@ -606,3 +606,21 @@ INNER JOIN [DropTable].[BI_Tiempo] T on biA.id_tiempo_publicacion = T.id_tiempo
 INNER JOIN [DropTable].[BI_Rango_etario] rE on rE.id_rango_etario = biA.id_rango_etario
 INNER JOIN [DropTable].[BI_Sucursal] S on s.id_sucursal = biA.id_sucursal
 GROUP BY biA.id_sucursal,s.nombre, biA.id_rango_etario,rE.edad_minima,rE.edad_maxima, T.anio
+
+
+
+/*
+ 
+9. Monto total de cierre de contratos por tipo de operación 
+(tanto de alquileres como ventas) por cada cuatrimestre y sucursal, diferenciando el tipo de moneda.
+ */
+CREATE VIEW DropTable.vista9 AS
+
+SELECT biTo.nombre , SUM(biA.precio_anuncio), biM.nombre , bis.nombre 
+FROM [DropTable].[BI_Hecho_Anuncio] biA
+INNER JOIN [DropTable].[BI_Tipo_Operacion] biTo on biTo.id_tipo_operacion = biA.id_tipo_operacion 
+INNER JOIN [DropTable].[BI_Sucursal] biS on biS.id_sucursal = biA.id_sucursal 
+INNER JOIN [DropTable].[BI_Tiempo] biTi on biTi.id_tiempo = biA.id_tiempo_finalizacion 
+INNER JOIN [DropTable].[BI_Moneda] biM on biM.id_moneda = biA.id_moneda 
+WHERE biA.estado_anuncio IN ('Alquilado','Vendido')
+GROUP BY biM.nombre , biTo.nombre , bis.nombre 
