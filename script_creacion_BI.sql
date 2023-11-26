@@ -499,11 +499,6 @@ FROM
 ) AS RankedAlquileres
 WHERE
     RowNum <= 5 OR TotalRows < 5
-ORDER BY
-    cuatrimestre,
-    id_rango_etario,
-    [CANTIDAD ALQUILERES] DESC;
-
 
      
 SELECT * FROM DropTable.vista3
