@@ -514,19 +514,22 @@ SELECT
  	TP.anio,
 	TP.mes,
     COUNT(*) AS TotalPagos,
-    SUM(CASE WHEN A.id_tiempo_fin_periodo <= A.id_tiempo_pago_alquiler THEN 1 ELSE 0 END) AS PagosEnTermino,
-    SUM(CASE WHEN A.id_tiempo_fin_periodo > A.id_tiempo_pago_alquiler THEN 1 ELSE 0 END) AS PagosAtrasados,
-    CAST(SUM(CASE WHEN A.id_tiempo_fin_periodo > A.id_tiempo_pago_alquiler THEN 1 ELSE 0 END) AS DECIMAL) / COUNT(*) * 100 AS PorcentajeIncumplimiento
+    SUM(CASE WHEN  TP.anio <= TP1.anio and TP.cuatrimestre <= TP1.cuatrimestre AND TP.mes <= TP1.mes  THEN 1 ELSE 0 END) AS PagosEnTermino,
+    SUM(CASE WHEN TP.anio > TP1.anio AND TP.cuatrimestre > TP1.cuatrimestre AND TP.mes > TP1.mes  THEN 1 ELSE 0 END) AS PagosAtrasados,
+    CAST(SUM(CASE WHEN TP.anio > TP1.anio AND TP.cuatrimestre > TP1.cuatrimestre AND TP.mes > TP1.mes  THEN 1 ELSE 0 END) AS DECIMAL) / COUNT(*) * 100 AS PorcentajeIncumplimiento
 FROM
     [DropTable].[BI_Hecho_Alquiler] A
 JOIN
     [DropTable].[BI_Tipo_inmueble] T ON A.id_tipo_inmueble = T.id_tipo_inmueble
 JOIN 
     [DropTable].[BI_Tiempo] TP ON TP.id_tiempo = A.id_tiempo_fin_periodo 
+INNER JOIN 
+	 [DropTable].[BI_Tiempo] TP1 ON TP1.id_tiempo = A.id_tiempo_pago_alquiler 
 GROUP BY
   --  T.nombre,
     A.id_tiempo_fin_periodo,TP.mes,
 	TP.anio;
+
 
 SELECT * FROM DropTable.vista4
 
