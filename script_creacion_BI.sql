@@ -438,3 +438,31 @@ GROUP BY
 
 
 SELECT * FROM DropTable.vista2
+
+
+-- Los 5 barrios más elegidos para alquilar en función del rango etario de los inquilinos
+-- para cada cuatrimestre/año. Se calcula en función de los alquileres dados de alta en dicho periodo.
+CREATE VIEW DropTable.vista3 AS
+SELECT
+    CONCAT(bre.edad_minima, ' ', bre.edad_maxima) as Rango_Etario
+    
+FROM
+    DropTable.BI_Rango_etario bre 
+LEFT JOIN
+    (
+        SELECT
+        	bha.id_rango_etario, 
+        	biU.barrio,
+        	Count(barrio) 
+        FROM
+            [DropTable].[BI_Hecho_Alquiler] bha  
+            INNER JOIN [DropTable].[BI_Ubicacion] biU on biU.id_Ubicacion = bha. -- agregar ubicaion al alquiler !! 
+            group by biU.barrio, bha.id_rango_etario
+  			ORDER BY Count(barrio) DESC
+            ) Barrios ON Barrios.id_rango_etario = bre.id_rango_etario
+GROUP BY
+     CONCAT(bre.edad_minima, ' ', bre.edad_maxima) as Rango_Etario,
+     
+
+
+SELECT * FROM DropTable.vista3
