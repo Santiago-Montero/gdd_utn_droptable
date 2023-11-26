@@ -615,12 +615,22 @@ GROUP BY biA.id_sucursal,s.nombre, biA.id_rango_etario,rE.edad_minima,rE.edad_ma
 (tanto de alquileres como ventas) por cada cuatrimestre y sucursal, diferenciando el tipo de moneda.
  */
 CREATE VIEW DropTable.vista9 AS
-
-SELECT biTo.nombre , SUM(biA.precio_anuncio), biM.nombre , bis.nombre 
-FROM [DropTable].[BI_Hecho_Anuncio] biA
-INNER JOIN [DropTable].[BI_Tipo_Operacion] biTo on biTo.id_tipo_operacion = biA.id_tipo_operacion 
-INNER JOIN [DropTable].[BI_Sucursal] biS on biS.id_sucursal = biA.id_sucursal 
-INNER JOIN [DropTable].[BI_Tiempo] biTi on biTi.id_tiempo = biA.id_tiempo_finalizacion 
-INNER JOIN [DropTable].[BI_Moneda] biM on biM.id_moneda = biA.id_moneda 
-WHERE biA.estado_anuncio IN ('Alquilado','Vendido')
-GROUP BY biM.nombre , biTo.nombre , bis.nombre 
+CREATE VIEW DropTable.vista9 AS
+SELECT
+    c.cuatrimestre,
+    a.Sucursal,
+    a.[Monto Total] as [Monto Total],
+    a.[Tipo Operacion] as [Tipo Operacion],
+    a.[Moneda] as [Moneda]
+FROM
+    DropTable.BI_Tiempo c
+LEFT JOIN (
+    SELECT biTo.nombre as [Tipo Operacion], SUM(biA.precio_anuncio) as [Monto Total], biM.nombre as [Moneda], bis.nombre as [Sucursal], biti.cuatrimestre
+    FROM [DropTable].[BI_Hecho_Anuncio] biA
+    INNER JOIN [DropTable].[BI_Tipo_Operacion] biTo on biTo.id_tipo_operacion = biA.id_tipo_operacion 
+    INNER JOIN [DropTable].[BI_Sucursal] biS on biS.id_sucursal = biA.id_sucursal 
+    INNER JOIN [DropTable].[BI_Tiempo] biTi on biTi.id_tiempo = biA.id_tiempo_finalizacion 
+    INNER JOIN [DropTable].[BI_Moneda] biM on biM.id_moneda = biA.id_moneda
+    WHERE biA.estado_anuncio IN ('Alquilado','Vendido')
+    GROUP BY biM.nombre , biTo.nombre , bis.nombre , biTi.cuatrimestre
+) a ON c.cuatrimestre = a.cuatrimestre
