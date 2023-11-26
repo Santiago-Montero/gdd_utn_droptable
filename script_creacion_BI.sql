@@ -453,6 +453,50 @@ GROUP BY
 SELECT * FROM DropTable.vista2
 
 
+CREATE VIEW DropTable.vista3 AS
+SELECT
+    cuatrimestre,
+    id_rango_etario,
+    [CANTIDAD ALQUILERES],
+    barrio
+FROM
+    (
+    SELECT
+        cuatrimestre.cuatrimestre ,
+        rango_etario.id_rango_etario,
+        biU.barrio,
+        COUNT(*) AS [CANTIDAD ALQUILERES],
+        ROW_NUMBER() OVER (PARTITION BY cuatrimestre.cuatrimestre , rango_etario.id_rango_etario ORDER BY COUNT(*) DESC) AS RowNum,
+        COUNT(*) OVER (PARTITION BY cuatrimestre.cuatrimestre , rango_etario.id_rango_etario) AS TotalRows
+    FROM
+        [DropTable].[BI_Tiempo] cuatrimestre
+    CROSS JOIN
+        [DropTable].[BI_Rango_etario] rango_etario
+    LEFT JOIN
+        [DropTable].[BI_Hecho_Alquiler] biA ON
+            biA.id_rango_etario = rango_etario.id_rango_etario
+            AND biA.id_tiempo_inicio  = cuatrimestre.id_tiempo
+    INNER JOIN
+        [DropTable].[BI_Tiempo] bt ON bt.id_tiempo = biA.id_tiempo_inicio
+    INNER JOIN
+        [DropTable].[BI_Ubicacion] biU ON biU.id_Ubicacion = biA.id_ubicacion
+    INNER JOIN
+        [DropTable].[BI_Rango_etario] bre ON bre.id_rango_etario = biA.id_rango_etario
+    GROUP BY
+        cuatrimestre.cuatrimestre ,
+        rango_etario.id_rango_etario,
+        biU.barrio
+) AS RankedAlquileres
+WHERE
+    RowNum <= 5 OR TotalRows < 5
+ORDER BY
+    cuatrimestre,
+    id_rango_etario,
+    [CANTIDAD ALQUILERES] DESC;
+
+
+     
+SELECT * FROM DropTable.vista3
 
 
 --4--
