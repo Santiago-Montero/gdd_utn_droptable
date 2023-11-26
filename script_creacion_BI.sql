@@ -601,19 +601,13 @@ GROUP BY
 CREATE VIEW DropTable.vista8 AS
 
 SELECT T.anio, s.nombre as Sucursal, CONCAT(rE.edad_minima,' hasta ',rE.edad_maxima) as Rango, COUNT(*) AS Cantidad_de_anuncios,
-(
+CONCAT( (convert(float,(
 SELECT COUNT(*)
 FROM [DropTable].[BI_Hecho_Anuncio] biA2
 INNER JOIN [DropTable].[BI_Tiempo] T2 on biA2.id_tiempo_publicacion = T2.id_tiempo
 WHERE T2.anio = T.anio AND biA2.estado_anuncio IN ('Alquilado','Vendido')
-) / 
-(
-SELECT COUNT(*) 
-from [DropTable].[BI_Hecho_Anuncio] biA3 
-INNER JOIN [DropTable].[BI_Tiempo] T3 on biA3.id_tiempo_publicacion = T3.id_tiempo
-WHERE T3.anio = T.anio 
-)
-as Porcentaje_ops_concretadas --NOTA: Esta division esta dando cero nose porque (PENDIENTE)
+)) / COUNT(*)) * 100, '%')
+as Porcentaje_ops_concretadas
 FROM [DropTable].[BI_Hecho_Anuncio] biA
 INNER JOIN [DropTable].[BI_Tiempo] T on biA.id_tiempo_publicacion = T.id_tiempo
 INNER JOIN [DropTable].[BI_Rango_etario] rE on rE.id_rango_etario = biA.id_rango_etario
