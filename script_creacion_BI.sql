@@ -105,7 +105,8 @@ CREATE TABLE [DropTable].[BI_Hecho_Anuncio](
     [id_tiempo_finalizacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tiempo]([id_tiempo]),
     [precio_anuncio] [int],
     [dias_publicado] [int],
-    [id_ubicacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Ubicacion]([id_Ubicacion])
+    [id_ubicacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Ubicacion]([id_Ubicacion]),
+	[estado_anuncio] varchar(255)
 );
 
 CREATE TABLE [DropTable].[BI_Hecho_Venta](
@@ -131,6 +132,7 @@ CREATE TABLE [DropTable].[BI_Hecho_Alquiler](
     [id_moneda] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Moneda]([id_moneda]),
     [deposito] [int],
     [id_rango_etario] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_etario]([id_rango_etario]),
+	[id_sucursal] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Sucursal]([id_sucursal]),
     [id_tiempo_inicio] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tiempo]([id_tiempo]),
     [id_tiempo_fin] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tiempo]([id_tiempo]),
     [comision] [int],
@@ -254,12 +256,12 @@ END;
     [precio_anuncio],
     [id_moneda],
     [id_rango_etario],
-    [dias_publicado]
-
+    [dias_publicado],
+	[estado_anuncio]
    
 ) SELECT bia.id_ambiente, biTI.id_tipo_inmueble , biS.id_sucursal, biTope.id_tipo_operacion,
 bim2.id_rango_m2, biTI2.id_tiempo, biTI1.id_tiempo, biu.id_Ubicacion, a.precio_anuncio , 
-biMo.id_moneda, biRE.id_rango_etario, DATEDIFF(DAY, a.fecha_publicacion,a.fecha_Finalizacion) 
+biMo.id_moneda, biRE.id_rango_etario, DATEDIFF(DAY, a.fecha_publicacion,a.fecha_Finalizacion), ea.nombre
 FROM [DropTable].[Anuncio] a
 INNER JOIN [DropTable].[Tipo_Operacion] tope ON tope.id_tipo_operacion = a.id_tipo_operacion 
 INNER JOIN [DropTable].[BI_Tipo_Operacion] biTope ON biTope.nombre = tope.nombre 
@@ -281,7 +283,8 @@ INNER JOIN [DropTable].[BI_Moneda] biMo ON mo.nombre  = biMo.nombre
 INNER JOIN [DropTable].[BI_Rango_etario] biRE ON DATEDIFF(year,pe.fecha_nacimiento, GETDATE()) BETWEEN biRE.edad_minima  AND biRE.edad_maxima 
 INNER JOIN [DropTable].[BI_Tiempo] biTI1 ON biTI1.anio = year(a.fecha_Finalizacion)  AND biTI1.mes = month(a.fecha_Finalizacion)
 INNER JOIN [DropTable].[BI_Tiempo] biTI2 ON biTI2.anio = year(a.fecha_publicacion) AND biTI2.mes = month(a.fecha_publicacion)
-GROUP BY bia.id_ambiente, biTI.id_tipo_inmueble,  biS.id_sucursal,biTope.id_tipo_operacion,  bim2.id_rango_m2 , biu.id_Ubicacion,biTI2.id_tiempo , biTI1.id_tiempo , biMo.id_moneda ,a.precio_anuncio , biRE.id_rango_etario, a.fecha_publicacion,a.fecha_Finalizacion 
+INNER JOIN [DropTable].[Estado_anuncio] ea ON a.id_estado_anuncio=ea.id_estado_anuncio
+GROUP BY bia.id_ambiente, biTI.id_tipo_inmueble,  biS.id_sucursal,biTope.id_tipo_operacion,  bim2.id_rango_m2 , biu.id_Ubicacion,biTI2.id_tiempo , biTI1.id_tiempo , biMo.id_moneda ,a.precio_anuncio , biRE.id_rango_etario, a.fecha_publicacion,a.fecha_Finalizacion, ea.nombre
 
 
 
@@ -298,7 +301,8 @@ insert into [DropTable].[BI_Hecho_venta](
     [comision_inmobiliaria],
     [id_ubicacion]
 
-) Select   bia.id_ambiente, biTope.id_Tipo_Operacion ,biTI.id_tipo_inmueble, bim2.id_rango_m2, bm.id_moneda, biS.id_sucursal ,biTI1.id_tiempo ,v.precio_venta,v.comision_inmobiliaria, biU.id_Ubicacion   from [DropTable].[Venta] v 
+) Select   bia.id_ambiente, biTope.id_Tipo_Operacion ,biTI.id_tipo_inmueble, bim2.id_rango_m2, bm.id_moneda, biS.id_sucursal ,biTI1.id_tiempo ,v.precio_venta,v.comision_inmobiliaria, biU.id_Ubicacion   
+from [DropTable].[Venta] v 
 inner join [DropTable].[moneda] m on v.id_moneda = m.id_moneda
 inner join [DropTable].[BI_Moneda] bm on m.nombre = bm.nombre --tengo modeda
 inner join [DropTable].[Anuncio] a on v.id_anuncio = a.id_anuncio 
@@ -330,6 +334,7 @@ id_rango_m2,
 id_tipo_inmueble,
 id_tipo_operacion,
 id_rango_etario,
+id_sucursal,
 id_tiempo_inicio,
 id_tiempo_fin,
 id_tiempo_pago_alquiler,
@@ -337,7 +342,8 @@ id_tiempo_inicio_periodo,
 id_tiempo_fin_periodo,
 id_ubicacion
 )
-SELECT a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo, biU.id_Ubicacion  FROM [DropTable].[Alquiler] a
+SELECT a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario, biS.id_sucursal  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo, biU.id_Ubicacion  
+FROM [DropTable].[Alquiler] a
 INNER JOIN [DropTable].[Anuncio] a2 ON a2.id_anuncio = a.id_anuncio 
 INNER JOIN [DropTable].[Inmueble] i ON i.id_inmueble = a2.id_inmueble
 INNER join [DropTable].[Moneda] m ON a2.id_moneda  = m.id_moneda
@@ -354,11 +360,13 @@ INNER JOIN [DropTable].[BI_Rango_m2] bim2 ON  i.superficie BETWEEN  bim2.metros_
 INNER JOIN [DropTable].[Inquilino] inq ON inq.id_alquiler = a.id_alquiler 
 INNER JOIN [DropTable].[Persona] pe ON inq.id_persona  = pe.id_persona  
 INNER JOIN [DropTable].[BI_Rango_etario] biRE ON DATEDIFF(year,pe.fecha_nacimiento, GETDATE()) BETWEEN biRE.edad_minima  AND biRE.edad_maxima 
+INNER JOIN [DropTable].[Agente] ag ON ag.id_agente = a2.id_agente -- voy a buscar agente para sucursal
+INNER JOIN [DropTable].[Sucursal] biS ON biS.id_sucursal = ag.id_sucursal 
 INNER JOIN [DropTable].[Barrio] b ON b.id_barrio = i.id_barrio 
 INNER JOIN [DropTable].[Localidad] l ON l.id_localidad  = b.id_localidad 
 INNER JOIN [DropTable].[Provincia] p ON p.id_provincia  = l.id_provincia  
 INNER JOIN [DropTable].[BI_Ubicacion] biU ON biU.provincia = p.nombre AND biu.localidad = l.nombre AND biU.barrio = b.nombre 
-group by a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo ,biU.id_Ubicacion 
+group by a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario, biS.id_sucursal  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo ,biU.id_Ubicacion 
 
 
 
