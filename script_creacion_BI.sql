@@ -119,7 +119,8 @@ CREATE TABLE [DropTable].[BI_Hecho_Venta](
    -- [id_rango_etario] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Rango_etario]([id_rango_etario]),
     [id_tiempo_venta] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tiempo]([id_tiempo]),
     [precio] [int],
-    [comision_inmobiliaria] [int]
+    [comision_inmobiliaria] [int],
+    [id_ubicacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Ubicacion]([id_Ubicacion])
 );
 
 CREATE TABLE [DropTable].[BI_Hecho_Alquiler](
@@ -135,7 +136,8 @@ CREATE TABLE [DropTable].[BI_Hecho_Alquiler](
     [comision] [int],
     [id_tiempo_pago_alquiler] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tiempo]([id_tiempo]),
     [id_tiempo_inicio_periodo] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tiempo]([id_tiempo]),
-    [id_tiempo_fin_periodo] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tiempo]([id_tiempo])
+    [id_tiempo_fin_periodo] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Tiempo]([id_tiempo]),
+    [id_ubicacion] [int] FOREIGN KEY REFERENCES [DropTable].[BI_Ubicacion]([id_Ubicacion])
 );
 
 -- INSERT VALUES 
@@ -281,6 +283,8 @@ INNER JOIN [DropTable].[BI_Tiempo] biTI1 ON biTI1.anio = year(a.fecha_Finalizaci
 INNER JOIN [DropTable].[BI_Tiempo] biTI2 ON biTI2.anio = year(a.fecha_publicacion) AND biTI2.mes = month(a.fecha_publicacion)
 GROUP BY bia.id_ambiente, biTI.id_tipo_inmueble,  biS.id_sucursal,biTope.id_tipo_operacion,  bim2.id_rango_m2 , biu.id_Ubicacion,biTI2.id_tiempo , biTI1.id_tiempo , biMo.id_moneda ,a.precio_anuncio , biRE.id_rango_etario, a.fecha_publicacion,a.fecha_Finalizacion 
 
+
+
 insert into [DropTable].[BI_Hecho_venta](
     [id_ambiente],
     [id_tipo_operacion],
@@ -291,9 +295,10 @@ insert into [DropTable].[BI_Hecho_venta](
    -- [id_rango_etario] ,
     [id_tiempo_venta] ,
     [precio] ,
-    [comision_inmobiliaria]
+    [comision_inmobiliaria],
+    [id_ubicacion]
 
-) Select   bia.id_ambiente, biTope.id_Tipo_Operacion ,biTI.id_tipo_inmueble, bim2.id_rango_m2, bm.id_moneda, biS.id_sucursal ,biTI1.id_tiempo ,v.precio_venta,v.comision_inmobiliaria    from [DropTable].[Venta] v 
+) Select   bia.id_ambiente, biTope.id_Tipo_Operacion ,biTI.id_tipo_inmueble, bim2.id_rango_m2, bm.id_moneda, biS.id_sucursal ,biTI1.id_tiempo ,v.precio_venta,v.comision_inmobiliaria, biU.id_Ubicacion   from [DropTable].[Venta] v 
 inner join [DropTable].[moneda] m on v.id_moneda = m.id_moneda
 inner join [DropTable].[BI_Moneda] bm on m.nombre = bm.nombre --tengo modeda
 inner join [DropTable].[Anuncio] a on v.id_anuncio = a.id_anuncio 
@@ -308,7 +313,11 @@ INNER JOIN [DropTable].[Agente] ag ON ag.id_agente = a.id_agente -- voy a buscar
 INNER JOIN [DropTable].[Sucursal] s ON s.id_sucursal = ag.id_sucursal 
 INNER JOIN [DropTable].[BI_Sucursal] biS ON biS.nombre = s.nombre
 INNER JOIN [DropTable].[BI_Tiempo] biTI1 ON biTI1.anio = year(v.fecha_venta)  AND biTI1.mes = month(v.fecha_venta)
-group by bia.id_ambiente, biTope.id_Tipo_Operacion ,biTI.id_tipo_inmueble, bim2.id_rango_m2, bm.id_moneda, biS.id_sucursal ,biTI1.id_tiempo ,v.precio_venta,v.comision_inmobiliaria  
+INNER JOIN [DropTable].[Barrio] b ON b.id_barrio = i.id_barrio 
+INNER JOIN [DropTable].[Localidad] l ON l.id_localidad  = b.id_localidad 
+INNER JOIN [DropTable].[Provincia] p ON p.id_provincia  = l.id_provincia  
+INNER JOIN [DropTable].[BI_Ubicacion] biU ON biU.provincia = p.nombre AND biu.localidad = l.nombre AND biU.barrio = b.nombre 
+group by bia.id_ambiente, biTope.id_Tipo_Operacion ,biTI.id_tipo_inmueble, bim2.id_rango_m2, bm.id_moneda, biS.id_sucursal ,biTI1.id_tiempo ,v.precio_venta,v.comision_inmobiliaria , biU.id_Ubicacion 
 
 
 
@@ -325,9 +334,10 @@ id_tiempo_inicio,
 id_tiempo_fin,
 id_tiempo_pago_alquiler,
 id_tiempo_inicio_periodo,
-id_tiempo_fin_periodo
+id_tiempo_fin_periodo,
+id_ubicacion
 )
-SELECT a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo FROM [DropTable].[Alquiler] a
+SELECT a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo, biU.id_Ubicacion  FROM [DropTable].[Alquiler] a
 INNER JOIN [DropTable].[Anuncio] a2 ON a2.id_anuncio = a.id_anuncio 
 INNER JOIN [DropTable].[Inmueble] i ON i.id_inmueble = a2.id_inmueble
 INNER join [DropTable].[Moneda] m ON a2.id_moneda  = m.id_moneda
@@ -344,7 +354,11 @@ INNER JOIN [DropTable].[BI_Rango_m2] bim2 ON  i.superficie BETWEEN  bim2.metros_
 INNER JOIN [DropTable].[Inquilino] inq ON inq.id_alquiler = a.id_alquiler 
 INNER JOIN [DropTable].[Persona] pe ON inq.id_persona  = pe.id_persona  
 INNER JOIN [DropTable].[BI_Rango_etario] biRE ON DATEDIFF(year,pe.fecha_nacimiento, GETDATE()) BETWEEN biRE.edad_minima  AND biRE.edad_maxima 
-group by a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo
+INNER JOIN [DropTable].[Barrio] b ON b.id_barrio = i.id_barrio 
+INNER JOIN [DropTable].[Localidad] l ON l.id_localidad  = b.id_localidad 
+INNER JOIN [DropTable].[Provincia] p ON p.id_provincia  = l.id_provincia  
+INNER JOIN [DropTable].[BI_Ubicacion] biU ON biU.provincia = p.nombre AND biu.localidad = l.nombre AND biU.barrio = b.nombre 
+group by a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo ,biU.id_Ubicacion 
 
 
 
@@ -393,7 +407,6 @@ GROUP BY
 SELECT * FROM DropTable.vista1
 
 
-
 CREATE VIEW DropTable.vista2 AS
 SELECT
     c.anio,
@@ -438,31 +451,3 @@ GROUP BY
 
 
 SELECT * FROM DropTable.vista2
-
-
--- Los 5 barrios más elegidos para alquilar en función del rango etario de los inquilinos
--- para cada cuatrimestre/año. Se calcula en función de los alquileres dados de alta en dicho periodo.
-CREATE VIEW DropTable.vista3 AS
-SELECT
-    CONCAT(bre.edad_minima, ' ', bre.edad_maxima) as Rango_Etario
-    
-FROM
-    DropTable.BI_Rango_etario bre 
-LEFT JOIN
-    (
-        SELECT
-        	bha.id_rango_etario, 
-        	biU.barrio,
-        	Count(barrio) 
-        FROM
-            [DropTable].[BI_Hecho_Alquiler] bha  
-            INNER JOIN [DropTable].[BI_Ubicacion] biU on biU.id_Ubicacion = bha. -- agregar ubicaion al alquiler !! 
-            group by biU.barrio, bha.id_rango_etario
-  			ORDER BY Count(barrio) DESC
-            ) Barrios ON Barrios.id_rango_etario = bre.id_rango_etario
-GROUP BY
-     CONCAT(bre.edad_minima, ' ', bre.edad_maxima) as Rango_Etario,
-     
-
-
-SELECT * FROM DropTable.vista3
