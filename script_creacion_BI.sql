@@ -325,7 +325,6 @@ INNER JOIN [DropTable].[BI_Ubicacion] biU ON biU.provincia = p.nombre AND biu.lo
 group by bia.id_ambiente, biTope.id_Tipo_Operacion ,biTI.id_tipo_inmueble, bim2.id_rango_m2, bm.id_moneda, biS.id_sucursal ,biTI1.id_tiempo ,v.precio_venta,v.comision_inmobiliaria , biU.id_Ubicacion 
 
 
-
 INSERT INTO[DropTable].[BI_Hecho_Alquiler]
 (
 deposito,
@@ -344,7 +343,7 @@ id_tiempo_fin_periodo,
 id_ubicacion,
 importe
 )
-SELECT a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario, biS.id_sucursal  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo, biU.id_Ubicacion  ,a2.precio_anuncio
+SELECT a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario, biS.id_sucursal  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo, biU.id_Ubicacion  ,a2.precio_anuncio 
 FROM [DropTable].[Alquiler] a
 INNER JOIN [DropTable].[Anuncio] a2 ON a2.id_anuncio = a.id_anuncio 
 INNER JOIN [DropTable].[Inmueble] i ON i.id_inmueble = a2.id_inmueble
@@ -368,8 +367,7 @@ INNER JOIN [DropTable].[Barrio] b ON b.id_barrio = i.id_barrio
 INNER JOIN [DropTable].[Localidad] l ON l.id_localidad  = b.id_localidad 
 INNER JOIN [DropTable].[Provincia] p ON p.id_provincia  = l.id_provincia  
 INNER JOIN [DropTable].[BI_Ubicacion] biU ON biU.provincia = p.nombre AND biu.localidad = l.nombre AND biU.barrio = b.nombre 
-group by a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario, biS.id_sucursal  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo ,biU.id_Ubicacion 
-
+group by a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tipo_inmueble , biTIO.id_tipo_operacion, biRE.id_rango_etario, biS.id_sucursal  , biTI1.id_tiempo ,  biTI2.id_tiempo, biTI3.id_tiempo ,biTI4.id_tiempo, biTI5.id_tiempo ,biU.id_Ubicacion, a2.precio_anuncio  
 
 
 
