@@ -528,6 +528,33 @@ GROUP BY
 
 SELECT * FROM DropTable.vista4
 
+CREATE VIEW DropTable.vista5 AS
+SELECT
+c.anio,
+    c.mes,
+   CASE
+        WHEN a.porcentaje_promedio_incremento < 0 OR a.porcentaje_promedio_incremento is null THEN 0
+        ELSE a.porcentaje_promedio_incremento
+    END AS porcentaje_promedio_incremento
+    
+FROM
+    DropTable.BI_Tiempo c
+LEFT JOIN (
+    SELECT biTi.mes, biA.importe  as  [nuevo], biAnterior.importe as [viejo],
+	AVG((convert(float,biA.importe - biAnterior.importe) / biAnterior.importe) * 100) AS porcentaje_promedio_incremento
+    FROM [DropTable].[BI_Hecho_Alquiler] biA
+    INNER JOIN [DropTable].[BI_Hecho_Alquiler] biAnterior ON biAnterior.id_tipo_operacion  = biA.id_tipo_operacion  
+    AND  biAnterior.deposito = biA.deposito AND biAnterior.id_rango_m2 = biA.id_rango_m2
+   	AND biA.id_moneda = biAnterior.id_moneda And biAnterior.comision = biA.comision and biA.id_tipo_inmueble = biAnterior.id_tipo_inmueble
+    and biAnterior.id_sucursal = biA.id_sucursal
+   and biAnterior.id_rango_etario = biA.id_rango_etario
+    INNER JOIN [DropTable].[BI_Tiempo] biTi on biTi.id_tiempo  = biA.id_tiempo_pago_alquiler
+    INNER JOIN [DropTable].[BI_Tiempo] biTiAnterior on biAnterior.id_tiempo_pago_alquiler  = biTiAnterior.id_tiempo  AND biTi.mes - biTiAnterior.mes = 1
+    GROUP BY  biTi.mes, biTi.anio, biA.importe, biAnterior.importe
+) a ON c.mes = a.mes
+GROUP BY c.anio, c.mes ,  a.porcentaje_promedio_incremento ,
+    a.nuevo,
+    a.viejo
 --6--
 CREATE VIEW DropTable.vista6 as
 SELECT
