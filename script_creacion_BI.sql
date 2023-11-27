@@ -559,29 +559,46 @@ SELECT * FROM DropTable.vista6
 
 --7--
 CREATE VIEW DropTable.vista7 as
-SELECT
+  SELECT
     biTo.nombre AS TipoOperacion,
     biS.nombre AS Sucursal,
     biTI.anio AS Anio,
     biTI.cuatrimestre AS Cuatrimestre,
-    ISNULL(AVG(
-        CASE
-            WHEN ha.id_tipo_operacion = 1 THEN hv.comision_inmobiliaria -- Venta
-            WHEN ha.id_tipo_operacion = 2 THEN ha.comision -- Alquiler
-            ELSE 0
-        END
-    ),0) AS ValorPromedioComision
+ avg(ha.comision) as PromedioComision -- Alquiler
+            
 FROM
     [DropTable].[BI_Hecho_Alquiler] ha
-LEFT JOIN
-    [DropTable].[BI_Hecho_Venta] hv ON ha.id_tipo_operacion = hv.id_tipo_operacion
-                                      AND ha.id_tiempo_inicio = hv.id_tiempo_venta
 INNER JOIN
     [DropTable].[BI_Tipo_Operacion] biTo ON ha.id_tipo_operacion = biTo.id_tipo_operacion
 INNER JOIN
     [DropTable].[BI_Sucursal] biS ON ha.id_sucursal = biS.id_sucursal
 INNER JOIN
     [DropTable].[BI_Tiempo] biTI ON ha.id_tiempo_inicio = biTI.id_tiempo
+GROUP BY
+    biTo.nombre,
+    biS.nombre,
+    biTI.anio,
+    biTI.cuatrimestre
+
+	union all
+	
+	SELECT
+    biTo.nombre AS TipoOperacion,
+    biS.nombre AS Sucursal,
+    biTI.anio AS Anio,
+    biTI.cuatrimestre AS Cuatrimestre,
+    
+   avg( hv.comision_inmobiliaria) as PromedioComision -- Venta
+    
+FROM
+    [DropTable].[BI_Hecho_venta] hv
+
+INNER JOIN
+    [DropTable].[BI_Tipo_Operacion] biTo ON hv.id_tipo_operacion = biTo.id_tipo_operacion
+INNER JOIN
+    [DropTable].[BI_Sucursal] biS ON hv.id_sucursal = biS.id_sucursal
+INNER JOIN
+    [DropTable].[BI_Tiempo] biTI ON hv.id_tiempo_venta = biTI.id_tiempo
 GROUP BY
     biTo.nombre,
     biS.nombre,
