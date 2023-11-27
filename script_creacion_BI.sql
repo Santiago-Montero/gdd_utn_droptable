@@ -661,7 +661,6 @@ GO
  */
  GO
 CREATE VIEW DropTable.vista9 AS
-CREATE VIEW DropTable.vista9 AS
 SELECT
     c.cuatrimestre,
     a.Sucursal,
