@@ -375,7 +375,7 @@ group by a.deposito , a.comision , bm.id_moneda ,bim2.id_rango_m2 , biTII.id_tip
 
 
 -- 1 
-
+GO
 CREATE VIEW DropTable.vista1 AS
 SELECT
     c.anio,
@@ -410,11 +410,11 @@ GROUP BY
     a.Ambientes,
     a.Barrio,
     a.Tipo_Operacion;
+GO
 
 
-SELECT * FROM DropTable.vista1
 
-
+GO
 CREATE VIEW DropTable.vista2 AS
 SELECT
     c.anio,
@@ -456,11 +456,10 @@ GROUP BY
     a.precio,
     a.Rango_m2,
     a.moneda
+GO
 
 
-SELECT * FROM DropTable.vista2
-
-
+GO
 CREATE VIEW DropTable.vista3 AS
 SELECT
     cuatrimestre,
@@ -497,12 +496,12 @@ FROM
 ) AS RankedAlquileres
 WHERE
     RowNum <= 5 OR TotalRows < 5
-
+GO
      
-SELECT * FROM DropTable.vista3
 
 
 --4--
+GO
 CREATE VIEW DropTable.vista4 AS
 SELECT
  --   T.nombre AS TipoInmueble,
@@ -524,10 +523,10 @@ GROUP BY
   --  T.nombre,
     A.id_tiempo_fin_periodo,TP.mes,
 	TP.anio;
+GO
 
 
-SELECT * FROM DropTable.vista4
-
+GO
 CREATE VIEW DropTable.vista5 AS
 SELECT
 c.anio,
@@ -555,7 +554,9 @@ LEFT JOIN (
 GROUP BY c.anio, c.mes ,  a.porcentaje_promedio_incremento ,
     a.nuevo,
     a.viejo
+    GO
 --6--
+GO
 CREATE VIEW DropTable.vista6 as
 SELECT
     T.nombre AS TipoInmueble,
@@ -580,11 +581,11 @@ GROUP BY
 	TI.anio,
 	TI.cuatrimestre,
 	TI.mes;
-
-SELECT * FROM DropTable.vista6
+GO
 
 
 --7--
+GO
 CREATE VIEW DropTable.vista7 as
   SELECT
     biTo.nombre AS TipoOperacion,
@@ -634,7 +635,7 @@ GROUP BY
 
 
 --8
-
+GO
 CREATE VIEW DropTable.vista8 AS
 
 SELECT T.anio, s.nombre as Sucursal, CONCAT(rE.edad_minima,' hasta ',rE.edad_maxima) as Rango, COUNT(*) AS Cantidad_de_anuncios,
@@ -650,7 +651,7 @@ INNER JOIN [DropTable].[BI_Tiempo] T on biA.id_tiempo_publicacion = T.id_tiempo
 INNER JOIN [DropTable].[BI_Rango_etario] rE on rE.id_rango_etario = biA.id_rango_etario
 INNER JOIN [DropTable].[BI_Sucursal] S on s.id_sucursal = biA.id_sucursal
 GROUP BY biA.id_sucursal,s.nombre, biA.id_rango_etario,rE.edad_minima,rE.edad_maxima, T.anio
-
+GO
 
 
 /*
@@ -658,6 +659,7 @@ GROUP BY biA.id_sucursal,s.nombre, biA.id_rango_etario,rE.edad_minima,rE.edad_ma
 9. Monto total de cierre de contratos por tipo de operación 
 (tanto de alquileres como ventas) por cada cuatrimestre y sucursal, diferenciando el tipo de moneda.
  */
+ GO
 CREATE VIEW DropTable.vista9 AS
 CREATE VIEW DropTable.vista9 AS
 SELECT
@@ -678,3 +680,4 @@ LEFT JOIN (
     WHERE biA.estado_anuncio IN ('Alquilado','Vendido')
     GROUP BY biM.nombre , biTo.nombre , bis.nombre , biTi.cuatrimestre
 ) a ON c.cuatrimestre = a.cuatrimestre
+GO
